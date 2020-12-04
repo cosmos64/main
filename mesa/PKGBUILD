@@ -1,100 +1,76 @@
 
-pkgbase=mesa
-pkgname=('mesa' 'libgl')
-pkgver=13.0.0
-_pkgver=13.0.0
+pkgname=mesa
+pkgver=20.2.3
+_pkgver=20.2.3
 pkgrel=1
 arch=('x86_64')
-makedepends=('glproto' 'libdrm' 'libxxf86vm' 'libxdamage' 'libva' 'expat' 'llvm' 'libx11' 'libxt' 'gcc-libs'
-             'dri2proto' 'python2' 'libxml2' 'imake' 'systemd' 'libvdpau' 'wayland' 'dri3proto'
-             'presentproto' 'libxshmfence' 'elfutils' 'libomxil-bellagio' 'clang' 'python2-mako')
-url="http://mesa3d.sourceforge.net"
+pkgdesc="Mesa 3-D graphics libraries and include files"
+depends=('libx11' 'libxt' 'gcc-libs' 'libvdpau' 'xorgproto' 'wayland' 'elfutils'
+           'libdrm' 'libxxf86vm' 'libxdamage' 'expat' 'libxshmfence' 'libomxil-bellagio' 'llvm'
+           'lm_sensors' 'libunwind' 'libxvmc' 'libxrandr' 'libglvnd' 'zstd') 
+makedepends=('libva' 'llvm' 'libxml2' 'imake' 'clang' 'python3-mako'
+             'wayland-protocols' 'meson' 'ninja')
+url="https://www.mesa3d.org/"
 license=('custom')
-source=(${source[@]} "ftp://ftp.freedesktop.org/pub/mesa/${_pkgver}/${pkgname}-${pkgver}.tar.xz"
-#source=("mesa::git://anongit.freedesktop.org/mesa/mesa#branch=master"
-       'LICENSE'
-       "https://github.com/imirkin/mesa/commit/2e6b0e24cfb0f467e8b6d6f394730442a72dcdaf.diff"
-       "https://github.com/imirkin/mesa/commit/2733e5483e1c2b80e4b0ae21187ec5e3e1579397.diff"
-       "https://github.com/imirkin/mesa/commit/940b3a773f264f3f52574160f0d06c48f8e8aeb2.diff")
-md5sums=('8c4ca7da1be2b8f9a877db09304335a4'
-         '5c65a0fe315dd347e09b1f2826a1df5a'
-         'cc6590fe2678e6ba8e8e762d59634a8b'
-         '1fd18456d593bb7ac55dd838a6202def'
-         '663c505d69473c2563996812769c9ffd')
-  
-build() {
+source=("https://mesa.freedesktop.org/archive/${pkgname}-${pkgver}.tar.xz"
+        "https://gitlab.freedesktop.org/mesa/mesa/commit/689817c9dfde9a0852f2b2489cb0fa93ffbcb215.diff"
+        'LICENSE')
+sha256sums=('ae1b240e11531df528d14dc214d2dc4d2b4f2e835c6230ba0b492b171eceb82b'
+            'fe619c39cdcbff3e4d79ec673e35f6eceb8bcab56113868277ff8295a2623702'
+            '7fdc119cf53c8ca65396ea73f6d10af641ba41ea1dd2bd44a824726e01c8b3f2')
+
+prepare() {
     cd ${pkgname}-${pkgver}
-    # http://www.linuxfromscratch.org/blfs/view/svn/x/mesa.html 
-    # libpthread-stubs package is useless on Linux
-    sed -i -e 's|pthread_stubs_possible="yes"|pthread_stubs_possible="no"|' configure.ac
     
-    # work in progress for nouveau fixes in qtwebengine
-    patch -p1 -i ${srcdir}/2e6b0e24cfb0f467e8b6d6f394730442a72dcdaf.diff
-    patch -p1 -i ${srcdir}/2733e5483e1c2b80e4b0ae21187ec5e3e1579397.diff
-    patch -p1 -i ${srcdir}/940b3a773f264f3f52574160f0d06c48f8e8aeb2.diff
-    
-    ./autogen.sh --prefix=/usr \
-    --sysconfdir=/etc \
-    --with-dri-driverdir=/usr/lib/xorg/modules/dri \
-    --with-gallium-drivers=r300,r600,nouveau,radeonsi,svga,swrast \
-    --with-dri-drivers=i915,i965,r200,radeon,nouveau,swrast \
-    --with-vulkan-drivers=intel \
-    --enable-gallium-llvm \
-    --with-egl-platforms=x11,drm,wayland \
-    --enable-llvm-shared-libs \
-    --with-clang-libdir=/usr/lib \
-    --enable-shared-glapi \
-    --enable-gbm \
-    --enable-glx-tls \
-    --enable-dri \
-    --enable-glx \
-    --enable-nine \
-    --enable-osmesa \
-    --enable-gles1 \
-    --enable-gles2 \
-    --enable-egl \
-    --enable-texture-float \
-    --enable-xa \
-    --enable-vdpau \
-    --enable-dri3 \
-    --enable-omx 
-    #--enable-openvg currently not ported yet with gallium-egl removal
-    
-  make
+    #patch -p1 -i ${srcdir}/689817c9dfde9a0852f2b2489cb0fa93ffbcb215.diff
 }
 
-package_libgl() {
-  depends=("mesa=${pkgver}")
-  pkgdesc="Mesa 3-D graphics library and DRI software rasterizer"
-
-  install -m755 -d ${pkgdir}/usr/lib
-  install -m755 -d ${pkgdir}/usr/lib/xorg/modules/extensions
-
-  ln -s libglx.xorg ${pkgdir}/usr/lib/xorg/modules/extensions/libglx.so
+build() {
+    mkdir -p build
+    cd build
   
-  ln -s mesa-libGL.so.1.2.0      ${pkgdir}/usr/lib/libGL.so
-  ln -s mesa-libGL.so.1.2.0      ${pkgdir}/usr/lib/libGL.so.1
-  ln -s mesa-libGL.so.1.2.0      ${pkgdir}/usr/lib/libGL.so.1.2.0
-
-  install -m755 -d ${pkgdir}/usr/share/licenses/libgl
-  install -m644 ${srcdir}/LICENSE ${pkgdir}/usr/share/licenses/libgl/
+  # use order in meson_options.txt to list build options, fill options from meson.build
+  meson ../${pkgname}-${pkgver} \
+    --prefix=/usr \
+    --sysconfdir=/etc \
+    --buildtype=release \
+    -Db_ndebug=true \
+    -Dplatforms=x11,wayland \
+    -Ddri3=true \
+    -Ddri-drivers=i915,i965,r200,nouveau \
+    -Dgallium-drivers=iris,r300,r600,nouveau,radeonsi,svga,swr,swrast,virgl \
+    -Dgallium-extra-hud=true \
+    -Dgallium-vdpau=enabled \
+    -Dgallium-xvmc=enabled \
+    -Dgallium-omx=bellagio \
+    -Dgallium-va=enabled \
+    -Dgallium-xa=enabled \
+    -Dgallium-nine=true \
+    -Dgallium-opencl=disabled \
+    -Dvulkan-drivers=amd,intel \
+    -Dvulkan-overlay-layer=false \
+    -Dvulkan-device-select-layer=false \
+    -Dshared-glapi=enabled \
+    -Dgles1=enabled \
+    -Dgles2=enabled \
+    -Dopengl=true \
+    -Dgbm=enabled \
+    -Dglx=dri \
+    -Degl=enabled \
+    -Dglvnd=true \
+    -Dllvm=enabled \
+    -Dvalgrind=disabled \
+    -Dlibunwind=enabled \
+    -Dlmsensors=enabled \
+    -Dbuild-tests=false \
+    -Dosmesa=gallium \
+    -Dswr-arches=avx,avx2 
+    ninja
 }
 
-package_mesa() {
-  depends=('libx11' 'libxt' 'gcc-libs' 'libvdpau' 'dri2proto' 'glproto' 'wayland' 'elfutils'
-           'libdrm' 'libxxf86vm' 'libxdamage' 'expat' 'libxshmfence' 'libomxil-bellagio' 'llvm') 
-  pkgdesc="Mesa 3-D graphics libraries and include files"
-  provides=('libglapi''libgles' 'libegl' 'khrplatform-devel' 'ati-dri' 'intel-dri' 'svga-dri' 'nouveau-dri')
-  conflicts=('libglapi' 'libgles' 'libegl' 'khrplatform-devel' 'ati-dri' 'intel-dri' 'svga-dri' 'nouveau-dri')
-  replaces=('libglapi' 'libgles' 'libegl' 'khrplatform-devel' 'ati-dri' 'intel-dri' 'svga-dri' 'nouveau-dri')
-
-  cd ${pkgname}-${pkgver}   
-  #cd "${srcdir}/mesa"
-  make DESTDIR=${pkgdir} install
-
-  # rename libgl.so to make it possible to package separately 
-  mv ${pkgdir}/usr/lib/libGL.so.1.2.0 	${pkgdir}/usr/lib/mesa-libGL.so.1.2.0
-  rm ${pkgdir}/usr/lib/libGL.so{,.1}
+package() {
+  cd build  
+  DESTDIR=${pkgdir} ninja install
 
   install -m755 -d ${pkgdir}/usr/share/licenses/mesa
   install -m644 ${srcdir}/LICENSE ${pkgdir}/usr/share/licenses/mesa/

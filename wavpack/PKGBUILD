@@ -1,28 +1,31 @@
 
 pkgname=wavpack
-pkgver=4.80.0
+_pkgname=WavPack
+pkgver=5.3.2
+_commit=e4e8d191e8dd74cbdbeaef3232c16a7ef517e68d
 pkgrel=1
 pkgdesc="Audio compression format with lossless, lossy, and hybrid compression modes"
 arch=('x86_64')
-url="http://www.wavpack.com/"
+url="https://www.wavpack.com/"
 license=('custom')
 depends=('glibc')
 options=('!libtool')
-source=("http://www.wavpack.com/${pkgname}-${pkgver}.tar.bz2")
-md5sums=('0f2f1184813dce1caf51b52af615ec17')
+#source=("http://www.wavpack.com/${pkgname}-${pkgver}.tar.bz2")
+source=("https://github.com/dbry/WavPack/archive/${_commit}.zip")
+md5sums=('ba6b734620b5dcf8645901f26f013ecc')
 
 build() {
-	cd ${pkgname}-${pkgver}
+	cd ${_pkgname}-${_commit}
 	
+	./autogen.sh
 	./configure --prefix=/usr \
 	      --libdir=/usr/lib \
-	      --enable-mmx \
 	      --disable-static
 	make
 }
 
 package() {
-	cd ${pkgname}-${pkgver}
+	cd ${_pkgname}-${_commit}
 	make DESTDIR=${pkgdir} install 
 	
 	install -Dm644 COPYING ${pkgdir}/usr/share/licenses/${pkgname}/LICENSE

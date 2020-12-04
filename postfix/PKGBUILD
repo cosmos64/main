@@ -1,23 +1,28 @@
 
 pkgname=postfix
-pkgver=3.1.3
+pkgver=3.5.8
 pkgrel=1
 pkgdesc='Secure, fast, easy to administer alternative to Sendmail'
 url='http://www.postfix.org/'
 arch=('x86_64')
 license=('custom')
-depends=('pcre' 'libsasl' 'libmariadbclient' 'postgresql-libs' 'sqlite3' 'libldap' 'db' 'icu')
+depends=('pcre' 'libsasl' 'mariadb' 'postgresql-libs' 'sqlite3' 'libldap' 'db' 'icu' 'libnsl')
 backup=('etc/postfix/'{access,aliases,canonical,generic,header_checks,main.cf,master.cf,relocated,transport,virtual})
-install=$pkgname.install
-source=("ftp://ftp.porcupine.org/mirrors/postfix-release/official/${pkgname}-${pkgver}.tar.gz"
+install=${pkgname}.install
+source=("https://high5.nl/mirrors/postfix-release/official/${pkgname}-${pkgver}.tar.gz"
         'aliases.patch'
-        'postfix.service')
-md5sums=('28a1dedbbbedfcf5fc09fd88bac116b6'
+        'postfix.service'
+        'glibc.patch')
+md5sums=('c7c55ccc1db2a30d35c3867c21fe7109'
          '9cc2ee3c72e134c2da5a895abaa56f30'
-         '24af169de13c34dac03d787c3e607ec5')
+         '24af169de13c34dac03d787c3e607ec5'
+         '33c2f08318f3caa6d7b9f5c68bbd2602')
 
 build() {
   cd ${pkgname}-${pkgver}
+  
+  #sed -i -e 's|34].*)|345].*)|g' makedefs
+  #patch -p1 -i ${srcdir}/glibc.patch
 
 	make makefiles DEBUG='' CCARGS=' \
 		-DUSE_SASL_AUTH -DUSE_CYRUS_SASL -I/usr/include/sasl \
@@ -42,7 +47,7 @@ package() {
 	cd ${pkgname}-${pkgver}
 
 	sh postfix-install -non-interactive \
-		install_root="${pkgdir}" \
+		install_root=${pkgdir} \
 		daemon_directory=/usr/lib/${pkgname} \
 		sample_directory=/etc/${pkgname}/sample \
 		manpage_directory=/usr/share/man \

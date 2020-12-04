@@ -1,39 +1,42 @@
 
 pkgname=colord
-pkgver=1.3.3
+pkgver=1.4.5
 pkgrel=1
 pkgdesc="System service easily manage, install and generate color profiles to manage input and output devices"
 arch=('x86_64')
-url="http://www.freedesktop.org/software/colord"
+url="https://www.freedesktop.org/software/colord"
 license=('GPL2')
-depends=('lcms2' 'polkit' 'sqlite3' 'systemd' 'libgusb' 'dbus' 'libgudev')
-makedepends=('intltool' 'gobject-introspection' 'vala' 'docbook-xsl' 'sane' 'bash-completion')
-opdepends=('sane')
+depends=('lcms2' 'polkit' 'sqlite3' 'systemd' 'libgusb' 'dbus' 'libgudev' 'sane')
+makedepends=('intltool' 'gobject-introspection' 'vala' 'docbook-xsl' 'sane' 'bash-completion' 'meson')
 options=('!libtool')
 install=colord.install
-source=("http://www.freedesktop.org/software/colord/releases/${pkgname}-${pkgver}.tar.xz")
-md5sums=('63ad39539845040141e8deffde11cf85')
+source=("https://www.freedesktop.org/software/colord/releases/${pkgname}-${pkgver}.tar.xz")
+sha256sums=('b774ea443d239f4a2ee1853bd678426e669ddeda413dcb71cea1638c4d6c5e17')
 
 build() {
-  cd ${pkgname}-${pkgver}
+  mkdir -p build
+  cd build
   
-  ./configure --prefix=/usr \
-    --sysconfdir=/etc \
+  #export LANG=en_US.UTF-8
+  
+  meson ../${pkgname}-${pkgver} \
+    --prefix=/usr \
+    --buildtype=release \
     --libexecdir=/usr/lib/colord \
     --localstatedir=/var \
-    --disable-static \
-    --with-systemdsystemunitdir=/usr/lib/systemd/system \
-    --with-daemon-user=colord \
-    --enable-vala \
-    --enable-sane \
-    --disable-argyllcms-sensor
-  make
+    -D sane=true \
+    -D vala=true \
+    -D docs=false \
+    -D man=false \
+    -D daemon_user=colord \
+    -D argyllcms_sensor=false
+  ninja
 }
 
 package() {
-  cd ${pkgname}-${pkgver}
+  cd build
+  DESTDIR=${pkgdir} ninja install
   
-  make DESTDIR=${pkgdir} install
   chown -R 124:124 ${pkgdir}/var/lib/colord
 }
 

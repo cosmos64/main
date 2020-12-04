@@ -1,0 +1,39 @@
+
+pkgname=lldb
+pkgver=10.0.1
+pkgrel=1
+pkgdesc="Next generation, high-performance debugger, built as a set of reusable components in the LLVM Project."
+arch=('x86_64')
+url="https://llvm.org/"
+license=('custom:University of Illinois/NCSA Open Source License')
+depends=("llvm=${pkgver}" 'libedit' 'libxml2' 'ncurses' 'python3-six')
+makedepends=('groff' 'swig' 'cmake' 'clang-tools-extra')
+source=("https://github.com/llvm/llvm-project/releases/download/llvmorg-${pkgver}/lldb-${pkgver}.src.tar.xz")
+md5sums=('0dddd62dd96ba97ccf075fc3ca086024')
+
+build() {
+    mkdir -p build
+    cd build
+    
+    cmake -G 'Unix Makefiles' \
+            -DCMAKE_BUILD_TYPE:STRING=Release \
+            -DCMAKE_INSTALL_PREFIX:PATH=/usr \
+            -DLLVM_LINK_LLVM_DYLIB:BOOL=ON \
+            -DLLDB_INCLUDE_TESTS=OFF \
+            -DLLDB_USE_SYSTEM_SIX=1 \
+            "../${pkgname}-${pkgver}.src"
+
+    make
+}
+
+package() {
+    cd build
+    make DESTDIR=${pkgdir} install
+    
+    # Python scripts
+    python3 -m compileall ${pkgdir}/usr/lib/python3.8/site-packages/lldb
+    python3 -O -m compileall ${pkgdir}/usr/lib/python3.8/site-packages/lldb
+    
+    install -D -m644 ../${pkgname}-${pkgver}.src/LICENSE.TXT ${pkgdir}/usr/share/licenses/${pkgname}/LICENSE    
+}
+

@@ -1,13 +1,13 @@
 
 pkgname=poppler-data
-pkgver=0.4.7
-pkgrel=2
+pkgver=0.4.10
+pkgrel=1
 pkgdesc="Encoding data for the poppler PDF rendering library"
 arch=('x86_64')
-url="http://poppler.freedesktop.org/"
+url="https://poppler.freedesktop.org/"
 license=('custom' 'GPL2')
-source=("http://poppler.freedesktop.org/${pkgname}-${pkgver}.tar.gz")
-md5sums=('636a8f2b9f6df9e7ced8ec0946961eaf')
+source=("https://poppler.freedesktop.org/${pkgname}-${pkgver}.tar.gz")
+md5sums=('a7f15fb2f26c60a7a92093cfdf2378d5')
 
 package() {
   cd ${pkgname}-${pkgver}

@@ -1,38 +1,50 @@
 
-_extramodules=extramodules-4.8
+_extramodules=extramodules-5.8
 _kver="$(cat /lib/modules/${_extramodules}/version)"
 
 pkgname=acpi_call
-pkgver=1.1.0
-pkgrel=23
+pkgver=3.17
+pkgrel=40
 pkgdesc="A kernel module that enables you to call parameterless ACPI methods by writing the method name to /proc/acpi/call, e.g. to turn off discrete graphics card in a dual graphics environment (like NVIDIA Optimus)."
 arch=('x86_64')
-url=("http://github.com/mkottman/acpi_call")
+url="https://github.com/teleshoes/acpi_call"
 license=('GPL')
-depends=('linux>=4.8' 'linux<4.9' 'linux-headers')
-makedepends=('git')
+depends=('linux>=5.8.16' 'linux<5.9' 'linux-headers')
+makedepends=('git' 'elfutils')
 install=acpi_call.install
-source=("https://github.com/mkottman/acpi_call/archive/v${pkgver}.tar.gz")
-md5sums=('f69d40e130b0e5ed17ce8adb19e6dda1')
+options=('!strip')
+source=("https://github.com/teleshoes/acpi_call/archive/${pkgver}.tar.gz"
+        "https://github.com/teleshoes/acpi_call/commit/0297c31fd9d0d7a0363b6ab6932f6420a6a6b2bc.diff")
+md5sums=('0f697ed8339dab7f605951cab8276210'
+         '46e959d4362890040c4b3773b3048ad0')
 
 build() {
-  cd ${srcdir}/$pkgname-${pkgver}
-  # needed for linux 3.17
-  sed -i 's|acpi/acpi.h|linux/acpi.h|' acpi_call.c
+  cd $pkgname-${pkgver}
+  # needed for linux 4.12
+  sed -i 's|asm/uaccess.h|linux/uaccess.h|' acpi_call.c
+  # needed for linux 5.6
+  patch -p1 -i ${srcdir}/0297c31fd9d0d7a0363b6ab6932f6420a6a6b2bc.diff
 
-  make KVERSION="${_kver}"
+  make KVERSION=${_kver}
 }
 package() {
-  cd ${srcdir}/$pkgname-${pkgver}
-  install -dm 755 "${pkgdir}"/lib/{modules/${_extramodules},modules-load.d}
-  install -m 644 ${pkgname}.ko "${pkgdir}"/lib/modules/${_extramodules}
+  cd $pkgname-${pkgver}
+  install -dm 755 ${pkgdir}/lib/{modules/${_extramodules},modules-load.d}
+  install -m 644 ${pkgname}.ko ${pkgdir}/lib/modules/${_extramodules}
   
-  gzip "${pkgdir}"/lib/modules/${_extramodules}/${pkgname}.ko
-  echo ${pkgname} > "${pkgdir}"/lib/modules-load.d/${pkgname}.conf
+  # sign the module
+  _file=/usr/src/linux-${_kver}/scripts/sign-file
+  _pem=/$HOME/signing_key.pem
+  _key=/$HOME/signing_key.x509
 
-  install -dm 755 "${pkgdir}"/usr/share/${pkgname}
-  cp -dr --no-preserve='ownership' {examples,support} "${pkgdir}"/usr/share/${pkgname}/
+  ${_file} sha256 ${_pem} ${_key} ${pkgdir}/lib/modules/${_extramodules}/acpi_call.ko
+  
+  gzip ${pkgdir}/lib/modules/${_extramodules}/${pkgname}.ko
+  echo ${pkgname} > ${pkgdir}/lib/modules-load.d/${pkgname}.conf
+
+  install -dm 755 ${pkgdir}/usr/share/${pkgname}
+  cp -dr --no-preserve='ownership' {examples,support} ${pkgdir}/usr/share/${pkgname}/
   
   #automatically update acpi_call.install
-  sed -i -e "s/EXTRAMODULES='.*'/EXTRAMODULES='${_extramodules}'/" "${startdir}/acpi_call.install"
+  sed -i -e "s/EXTRAMODULES='.*'/EXTRAMODULES='${_extramodules}'/" ${startdir}/acpi_call.install
 }

@@ -1,30 +1,36 @@
 
-_extramodules=extramodules-4.8
+_extramodules=extramodules-5.8
 _kver=$(cat /lib/modules/${_extramodules}/version)
 
 pkgname=('nvidia-340xx' 'khd-nvidia-340xx')
-pkgver=340.98
-pkgrel=3
+pkgver=340.108
+pkgrel=14
 arch=('x86_64')
 url="http://www.nvidia.com/"
-makedepends=('linux-headers' 'linux>=4.8' 'linux<4.9' "nvidia-340xx-utils=${pkgver}")
+makedepends=('linux-headers' 'linux>=5.8.16' 'linux<5.9' "nvidia-340xx-utils=${pkgver}")
 license=('custom')
+options=('!strip')
 
 _pkg="NVIDIA-Linux-x86_64-${pkgver}-no-compat32"
 
-source=("ftp://download.nvidia.com/XFree86/Linux-x86_64/${pkgver}/${_pkg}.run"
+source=("http://us.download.nvidia.com/XFree86/Linux-x86_64/${pkgver}/${_pkg}.run"
         "https://raw.github.com/KaOSx/hardware-detection/master/hwdb/nvidia_supported"
-        'linux-4.6.patch')
-md5sums=('e8d1292d8d002a15e10ea349151fa8f2'
+        'linux-5.patch'
+        'linux-5.8.patch')
+md5sums=('e783e383bd4344d590ad429eb0883717'
          '62d0cdb856cfae64753c0f3acf729d47'
-         '1f2baa65fd351ae7a2fc3dfd71ffcbfe')
+         '768a57cba24b1a1c075c5767a27bd44c'
+         'd2e9ec8ec9bdf7a99521041d0f7d5cbc')
 
 build() {
     cd "${srcdir}"
     sh "${_pkg}.run" --extract-only
     
     cd "${_pkg}"
-    #patch -p1 -i ${srcdir}/linux-4.6.patch
+    patch -p1 -i ${srcdir}/linux-5.patch
+    patch -p1 -i ${srcdir}/linux-5.8.patch
+    # sed line needed for linux 4.9 & 340.101
+    #sed -i 's/= DRIVER_GEM | DRIVER_PRIME,/= DRIVER_GEM | DRIVER_PRIME | DRIVER_LEGACY,/g' kernel/nv-drm.c
     
     cd "${srcdir}/${_pkg}/kernel"  
     make SYSSRC=/lib/modules/"${_kver}/build" module
@@ -32,14 +38,21 @@ build() {
 
 package_nvidia-340xx() {
     pkgdesc="NVIDIA drivers for linux."
-    depends=('linux>=4.8' 'linux<4.9' "nvidia-340xx-utils=${pkgver}")
+    depends=('linux>=5.8.16' 'linux<5.9' "nvidia-340xx-utils=${pkgver}")
     conflicts=('nvidia' 'nvidia-304xx')
     replaces=('nvidia-304xx')
     backup=('etc/X11/xorg.conf.d/20-nvidia.conf')
     install=nvidia.install
     
-    install -D -m644 "${srcdir}/${_pkg}/kernel/nvidia.ko" \
-        "${pkgdir}/lib/modules/${_extramodules}/nvidia.ko"
+    install -D -m644 "${srcdir}/${_pkg}/kernel/nvidia.ko" "${pkgdir}/lib/modules/${_extramodules}/nvidia.ko"
+    
+    # sign the module
+    _file=/usr/src/linux-${_kver}/scripts/sign-file
+    _pem=/$HOME/signing_key.pem
+    _key=/$HOME/signing_key.x509
+
+    ${_file} sha256 ${_pem} ${_key} ${pkgdir}/lib/modules/${_extramodules}/nvidia.ko
+  
     install -d -m755 "${pkgdir}/etc/modprobe.d"
     echo "blacklist nouveau" >> "${pkgdir}/etc/modprobe.d/nouveau_blacklist.conf"
     

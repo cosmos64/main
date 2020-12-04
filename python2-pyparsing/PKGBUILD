@@ -1,15 +1,15 @@
 
 pkgname=python2-pyparsing
-pkgver=2.1.10
+pkgver=2.4.7
 pkgrel=1
 pkgdesc='General parsing module for Python'
 arch=('x86_64')
-url='http://pyparsing.wikispaces.com'
+url='https://pypi.org/project/pyparsing/'
 license=('MIT')
 depends=('python2')
 makedepends=('python2-setuptools')
-source=("http://downloads.sourceforge.net/pyparsing/pyparsing-${pkgver}.tar.gz")
-md5sums=('065908b92904e0d3634eb156f44cc80e')
+source=("https://github.com/pyparsing/pyparsing/releases/download/pyparsing_${pkgver}/pyparsing-${pkgver}.tar.gz")
+md5sums=('f0953e47a0112f7a65aec2305ffdf7b4')
 
 package() {
   cd pyparsing-${pkgver}

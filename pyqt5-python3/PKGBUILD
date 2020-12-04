@@ -1,26 +1,29 @@
 
 pkgname=pyqt5-python3
-pkgver=5.7
-_snapshot=dev1604260930
+pkgver=5.15.2
 pkgrel=1
 pkgdesc="A set of Python3 bindings for the Qt toolkit"
 arch=('x86_64')
-url="http://riverbankcomputing.co.uk/software/pyqt/intro"
+url="https://www.riverbankcomputing.com/software/pyqt/intro"
 license=('GPL')
-depends=('sip3' 'dbus-python3' 'qt5-multimedia' 'qt5-serialport' 'qt5-svg' 'qt5-webkit' 'qtwebengine')
+depends=('sip3' 'dbus-python3' 'qt5-multimedia' 'qt5-serialport' 'qt5-svg' 'qtwebkit-tp' 'qt5-speech')
 makedepends=('qt5-tools')
-source=("http://sourceforge.net/projects/pyqt/files/PyQt5/PyQt-${pkgver}/PyQt5_gpl-${pkgver}.tar.gz")
-#source=("https://www.riverbankcomputing.com/static/Downloads/PyQt5/PyQt5_gpl-5.6.1.${_snapshot}.tar.gz")
-md5sums=('e3dc21f31fd714659f0688e1eb31bacf')
+source=("https://pypi.python.org/packages/source/P/PyQt5/PyQt5-${pkgver}.tar.gz"
+        'qt5.11.patch')
+#source=("https://www.riverbankcomputing.com/static/Downloads/PyQt5/PyQt5_gpl-5.6.1.${_commit}.tar.gz")
+sha256sums=('372b08dc9321d1201e4690182697c5e7ffb2e0770e6b4a45519025134b12e4fc'
+            '34bba97f87615ea072312bfc03c4d3fb0a1cf7a4cd9d6907857c1dca6cc89200')
 
 build() {
-  cd PyQt5_gpl-${pkgver}
+  cd PyQt5-${pkgver}
+  #patch -p1 -i ${srcdir}/qt5.11.patch 
 
   python3 configure.py \
     --confirm-license \
     --qsci-api \
     -q /usr/lib/qt5/bin/qmake \
-    --designer-plugindir /usr/lib/qt5/plugins/designer 
+    --designer-plugindir /usr/lib/qt5/plugins/designer \
+    --no-dist-info
 
   #find -name 'Makefile' | xargs sed -i 's|-Wl,-rpath,/usr/lib||g;s|-Wl,-rpath,.* ||g'
 
@@ -28,7 +31,7 @@ build() {
 }
 
 package(){
-  cd PyQt5_gpl-${pkgver}
+  cd PyQt5-${pkgver}
   # INSTALL_ROOT is needed for the QtDesigner module, the other Makefiles use DESTDIR
   make DESTDIR=${pkgdir} INSTALL_ROOT=${pkgdir} install
 }

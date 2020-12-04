@@ -1,28 +1,33 @@
 
 pkgname=libvdpau
-pkgver=1.1.1
-pkgrel=2
+pkgver=1.4
+pkgrel=1
 pkgdesc="Nvidia VDPAU library"
 arch=('x86_64')
-url="http://cgit.freedesktop.org/~aplattner/libvdpau"
+url="https://gitlab.freedesktop.org/vdpau/libvdpau"
 depends=('gcc-libs' 'libxext')
-makedepends=('dri2proto')
+makedepends=('dri2proto' 'meson' 'ninja')
 options=('!libtool')
 license=('custom')
-source=("http://people.freedesktop.org/~aplattner/vdpau/${pkgname}-${pkgver}.tar.gz")
-md5sums=('ac8b21012035c04fd1ec8a9ae6934264')
+source=("https://gitlab.freedesktop.org/vdpau/libvdpau/-/archive/${pkgname}-${pkgver}/${pkgname}-${pkgname}-${pkgver}.tar.bz2")
+sha256sums=('0edf4257035ac09a7f781c46147835c6b2d154f0ded46dc4a8551634e891ad93')
 
 build() {
-  cd ${pkgname}-${pkgver}
+  mkdir -p build
+  cd build
   
-  ./configure --prefix=/usr --sysconfdir=/etc
-  make
+  meson ../${pkgname}-${pkgname}-${pkgver} \
+    --prefix=/usr \
+    --sysconfdir=/etc \
+    --buildtype=release 
+  ninja
 }
 
 package() {
-  cd ${pkgname}-${pkgver}
-  make DESTDIR=${pkgdir} install 
+  cd build
+  
+  DESTDIR=${pkgdir} ninja install
 
   install -d -m755 ${pkgdir}/usr/share/licenses/${pkgname}
-  install -m644 COPYING ${pkgdir}/usr/share/licenses/${pkgname}/ 
+  install -m644 ../${pkgname}-${pkgname}-${pkgver}/COPYING ${pkgdir}/usr/share/licenses/${pkgname}/ 
 }

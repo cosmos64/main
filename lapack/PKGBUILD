@@ -1,9 +1,9 @@
 
 pkgname=lapack
-pkgver=3.6.1
+pkgver=3.9.0
 pkgrel=1
 arch=('x86_64')
-url="http://www.netlib.org/lapack"
+url="https://www.netlib.org/lapack"
 pkgdesc="Linear Algebra PACKage"
 depends=('gcc-libs')
 makedepends=('gcc' 'cmake')
@@ -11,14 +11,13 @@ conflicts=('blas' 'atlas-lapack')
 replaces=('blas' 'atlas-lapack')
 provides=('blas')
 license=("custom")
-source=("http://www.netlib.org/lapack/${pkgname}-${pkgver}.tgz")
-md5sums=('421b2cb72e15f237e144428f9c460ee0')
+source=("https://github.com/Reference-LAPACK/lapack/archive/v${pkgver}.tar.gz")
+md5sums=('0b251e2a8d5f949f99b50dd5e2200ee2')
 
 build() {
-  cd ${srcdir}
-
-  install -d build
+  mkdir -p build
   cd build
+  
   cmake ../${pkgname}-${pkgver} \
     -DCMAKE_BUILD_TYPE=Release \
     -DCMAKE_SKIP_RPATH=ON \
@@ -35,8 +34,8 @@ package() {
   make DESTDIR=$pkgdir install
   
   # install the test bin options
-  install -m755 -d ${pkgdir}/usr/bin
-  install -m755 ${srcdir}/build/bin/* ${pkgdir}/usr/bin
+  #install -m755 -d ${pkgdir}/usr/bin
+  #install -m755 ${srcdir}/build/bin/* ${pkgdir}/usr/bin
   
   install -m755 -d ${pkgdir}/usr/share/licenses/lapack
   install -m644 ${srcdir}/${pkgname}-${pkgver}/LICENSE  ${pkgdir}/usr/share/licenses/lapack/

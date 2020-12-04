@@ -1,44 +1,43 @@
 
 pkgname=opencl-headers
-pkgver=2.0.20150827
-_clbasever=2.0 
+pkgver=2.2.20200616
+_pkgver=22
 pkgrel=1
 pkgdesc='OpenCL (Open Computing Language) header files'
 arch=('x86_64')
-url='http://www.khronos.org/registry/cl/'
+url='https://www.khronos.org/registry/cl/'
 license=('custom')
-depends=('libcl')
 source=('LICENSE.txt'
-        "http://www.khronos.org/registry/cl/api/${_clbasever}/cl_ext.h"
-        "http://www.khronos.org/registry/cl/api/${_clbasever}/cl_gl_ext.h"
-        "http://www.khronos.org/registry/cl/api/${_clbasever}/cl_egl.h"
-        "http://www.khronos.org/registry/cl/api/${_clbasever}/cl_gl.h"
-        "http://www.khronos.org/registry/cl/api/${_clbasever}/cl.h"
-        "http://www.khronos.org/registry/cl/api/${_clbasever}/cl2.hpp"
-        "http://www.khronos.org/registry/cl/api/${_clbasever}/cl_platform.h"
-        "http://www.khronos.org/registry/cl/api/${_clbasever}/cl_dx9_media_sharing.h"
-        "http://www.khronos.org/registry/cl/api/${_clbasever}/cl_d3d10.h"
-        "http://www.khronos.org/registry/cl/api/${_clbasever}/cl_d3d11.h"
-        "http://www.khronos.org/registry/cl/api/${_clbasever}/opencl.h")
+        "https://raw.githubusercontent.com/KhronosGroup/OpenCL-Headers/master/CL/cl_ext.h"
+        "https://raw.githubusercontent.com/KhronosGroup/OpenCL-Headers/master/CL/cl_gl_ext.h"
+        "https://raw.githubusercontent.com/KhronosGroup/OpenCL-Headers/master/CL/cl_egl.h"
+        "https://raw.githubusercontent.com/KhronosGroup/OpenCL-Headers/master/CL/cl_gl.h"
+        "https://raw.githubusercontent.com/KhronosGroup/OpenCL-Headers/master/CL/cl.h"
+        "https://github.com/KhronosGroup/OpenCL-CLHPP/releases/download/v2.0.10/cl2.hpp"
+        "https://raw.githubusercontent.com/KhronosGroup/OpenCL-Headers/master/CL/cl_platform.h"
+        "https://raw.githubusercontent.com/KhronosGroup/OpenCL-Headers/master/CL/cl_dx9_media_sharing.h"
+        "https://raw.githubusercontent.com/KhronosGroup/OpenCL-Headers/master/CL/cl_d3d10.h"
+        "https://raw.githubusercontent.com/KhronosGroup/OpenCL-Headers/master/CL/cl_d3d11.h"
+        "https://raw.githubusercontent.com/KhronosGroup/OpenCL-Headers/master/CL/opencl.h")
 md5sums=('8e59f0e0f64326e826007b49700fba76'
-         'a31487129afd2040c98597f31a7a0039'
-         '25cf9128d1d189a08b19a6a47693e71e'
-         'b58aebb229378ac0c8d076828ea37a24'
-         'c85b5c61940ca3dd42d76dc93baaba9b'
-         '8fce851a7e009583a5ee10dec9111cda'
-         '85bd00be0df339d5d2c90d7d2077268d'
-         '56bc3c5aec53109c4b9d794740a7a4f6'
-         'bbec1ee4f18461b9401585641084ee96'
-         '4e4921ba92e5b8fd09eebea9c5d368d5'
-         '22a787c1212677ad192ab93531b4439f'
-         'f6d1ab7b5a3230990e29fa236ab043dc')
+         'e7eca9fc0b3bcde0d02917829b3e842b'
+         '0d196a3be37ae23101c2f091f6bab31e'
+         'b291d42e448d5e194436d1ad4590d8e8'
+         '9088b53f5936a221a234f729fec25e78'
+         'a940040af92ae6074d14327d96067157'
+         'c38d1b78cd98cc809fa2a49dbd1734a5'
+         'cc89e52044221ed9b5ab2bd2bea3dbef'
+         'be180e64078f043dff84af20485f8698'
+         '3c3d2f86d4fdb30626627009b597befd'
+         '9d34b531af1942f6d65cfbae0ea9abc0'
+         'd248a32f55fe670cf18512f78eae06b5')
 
 package() {
-   install -dm755 "${pkgdir}"/usr/include/CL
+   install -dm755 ${pkgdir}/usr/include/CL
 
    for h in $(ls -1 *.h *.hpp); do
-      install -m 644 ${h} "${pkgdir}"/usr/include/CL/
+      install -m 644 ${h} ${pkgdir}/usr/include/CL/
    done
 
-   install -D -m644 ../LICENSE.txt "${pkgdir}"/usr/share/licenses/${pkgname}/LICENSE
+   install -D -m644 ../LICENSE.txt ${pkgdir}/usr/share/licenses/${pkgname}/LICENSE
 }

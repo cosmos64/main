@@ -1,23 +1,31 @@
 
 pkgname=usb_modeswitch
-pkgver=2.4.0
-pkgrel=2
-_pkgdata=20160612
+pkgver=2.6.1
+pkgrel=1
+_pkgdata=20191128
 pkgdesc="Activating switchable USB devices on Linux."
 arch=('x86_64')
-url="http://www.draisberghof.de/usb_modeswitch/"
+url="https://www.draisberghof.de/usb_modeswitch/"
 license=('GPL3')
 depends=('libusb' 'tcl')
 makedepends=('gcc' 'make')
 groups=('system')
 backup=("etc/${pkgname}.conf")
-source=("http://www.draisberghof.de/${pkgname}/usb-modeswitch-${pkgver}.tar.bz2"
-        "http://www.draisberghof.de/${pkgname}/usb-modeswitch-data-${_pkgdata}.tar.bz2"
-        "usb-modeswitch-${pkgver}-device_reference.txt::http://www.draisberghof.de/${pkgname}/device_reference.txt")
-md5sums=('6e1640db47768bb9012f91b7593116ef'
-         'e3d30774dc594131ce3398b1e669d427'
-         '080bac4145f002466b1cbd1b973bba44')
+source=("https://www.draisberghof.de/${pkgname}/usb-modeswitch-${pkgver}.tar.bz2"
+        "https://www.draisberghof.de/${pkgname}/usb-modeswitch-data-${_pkgdata}.tar.bz2"
+        "usb-modeswitch-${pkgver}-device_reference.txt::https://www.draisberghof.de/${pkgname}/device_reference.txt"
+        '40-usb_modeswitch.diff')
+md5sums=('69d00d6ed7097b97d972a159d14cfba1'
+         'e8fce7eb949cbe16c61fb71bade4cc17'
+         '91f3b3638f013fd343bd98b251ce646f'
+         'fdeec64154f1e7d8f671c5e2d187ab46')
 
+prepare() {
+  cd usb-modeswitch-data-${_pkgdata}
+  # exclude flip phones, see https://forum.kaosx.us/d/1790-kaos-and-doro-626/12
+  patch -p1 -i ${srcdir}/40-usb_modeswitch.diff
+}
+         
 build() {
   cd usb-modeswitch-${pkgver}/
   make clean

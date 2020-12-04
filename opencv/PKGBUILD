@@ -1,46 +1,49 @@
 
 pkgname=opencv
-pkgver=3.1.0
-_pkgver=3.1.0
-pkgrel=6
+pkgver=4.5.0
+_pkgver=4.5.0
+pkgrel=1
 pkgdesc="Open Source Computer Vision Library"
 arch=('x86_64')
-license=('BSD')
-url="http://opencv.org/"
-depends=('jasper' 'gst-plugins-base' 'openexr' 'libdc1394' 'v4l-utils' 'ffmpeg' 'qt5-base'
-         'libgphoto2' 'libwebp' 'protobuf')
-makedepends=('pkgconfig' 'cmake' 'python2-numpy' 'eigen3' 'python2-sphinx' 'mesa')
-optdepends=('python2-numpy: Python 2.x interface' 'eigen3') #eigen3 for 3.0.0
+license=('Apache2')
+url="https://opencv.org/"
+depends=('gst-plugins-base' 'openexr' 'libdc1394' 'v4l-utils' 'ffmpeg' 'qt5-base'
+         'libgphoto2' 'libwebp') # 'protobuf')
+makedepends=('pkgconfig' 'cmake' 'python3-numpy' 'python3-setuptools' 'eigen3' 'python3-sphinx' 'mesa' 'glew')
+optdepends=('python3-numpy: Python 3.x interface' 'eigen3')
 options=('!libtool')
-conflicts=('opencv-qt5')
-replaces=('opencv-qt5')
-provides=('opencv-qt5')
 source=("https://github.com/Itseez/opencv/archive/${_pkgver}.tar.gz"
         "opencv_contrib-${_pkgver}::https://github.com/Itseez/opencv_contrib/archive/${_pkgver}.tar.gz"
         "https://github.com/alalek/opencv/commit/24dbb43c096691d0333cacf231e22f1369f8c826.patch"
-        'opengl.diff')
-md5sums=('70e1dd07f0aa06606f1bc0e3fa15abd3'
-         'a822839ad3ab79ff837c16785ea9dd10'
-         '5bd9cd736b171c15cedee3a32a0c47ff'
-         '20bc30c514f6f01cfbaaa7e1e0fcb39b')
+        "https://github.com/opencv/opencv_contrib/commit/c4419e4e65a8d9e0b5a15e9a5242453f261bee46.diff")
+md5sums=('65ecd733f41b8286debfc4f29bd0d453'
+         'bcd25c6796f647a4a14e3235c7eddd6a'
+         'fea946fad4f25b47e8c8db37d5843863'
+         'de1f1ad27a3da356706ba6a6fa74622b')
 
+prepare () {
+  cd opencv_contrib-${_pkgver}
+  
+  #patch -p1 -i ${srcdir}/c4419e4e65a8d9e0b5a15e9a5242453f261bee46.diff
+}
+         
 build() {
   cd ${pkgname}-${_pkgver}
-  # fix cannot find -lippicv when building with opencv 3.1.0
-  patch -p1 -i ${srcdir}/24dbb43c096691d0333cacf231e22f1369f8c826.patch
-  patch -p1 -i ${srcdir}/opengl.diff
+  # known Eigen3 issue upstream https://github.com/opencv/opencv/pull/15247
+  #sed -e "s|include <Eigen/Core>|include <eigen3/Eigen/Core>|" -i modules/core/include/opencv2/core/private.hpp
  
   mkdir -p build 
   cd build
 
   cmake .. -DCMAKE_BUILD_TYPE=Release \
         -DCMAKE_INSTALL_PREFIX=/usr \
+        -DCMAKE_INSTALL_LIBDIR=lib \
         -DCMAKE_SKIP_RPATH=ON \
         -DBUILD_TESTS=OFF \
-        -DENABLE_SSE3=OFF \
         -DBUILD_EXAMPLES=ON \
         -DINSTALL_C_EXAMPLES=ON \
         -DINSTALL_PYTHON_EXAMPLES=ON \
+        -DBUILD_opencv_python3=ON \
         -DWITH_XINE=OFF \
         -DWITH_QT=ON \
         -DWITH_OPENGL=ON \
@@ -48,7 +51,9 @@ build() {
         -DWITH_CUDA=OFF \
         -DWITH_GTK=OFF \
         -DENABLE_FAST_MATH=ON \
-        -DOPENCV_EXTRA_MODULES_PATH=${srcdir}/opencv_contrib-${_pkgver}/modules
+        -DOPENCV_EXTRA_MODULES_PATH=${srcdir}/opencv_contrib-${_pkgver}/modules \
+        -DOPENCV_GENERATE_PKGCONFIG=ON \
+        -DOPENCV_ENABLE_NONFREE=ON
   make
 }
 

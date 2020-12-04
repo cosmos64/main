@@ -198,3 +198,224 @@ index eb00717..489c9f5 100644
 +#endif
  		wl->scan_request = NULL;
  	}
+
+diff --git a/src/wl/sys/wl_cfg80211_hybrid.c b/src/wl/sys/wl_cfg80211_hybrid.c
+index a9671e2..da36405 100644
+--- a/src/wl/sys/wl_cfg80211_hybrid.c
++++ b/src/wl/sys/wl_cfg80211_hybrid.c
+@@ -30,6 +30,9 @@
+ #include <linux/kthread.h>
+ #include <linux/netdevice.h>
+ #include <linux/ieee80211.h>
++#if LINUX_VERSION_CODE >= KERNEL_VERSION(4, 11, 0)
++#include <linux/sched/signal.h>
++#endif
+ #include <net/cfg80211.h>
+ #include <linux/nl80211.h>
+ #include <net/rtnetlink.h>
+diff --git a/src/wl/sys/wl_linux.c b/src/wl/sys/wl_linux.c
+index 489c9f5..f8278ad 100644
+--- a/src/wl/sys/wl_linux.c
++++ b/src/wl/sys/wl_linux.c
+@@ -117,6 +117,9 @@ int wl_found = 0;
+ 
+ typedef struct priv_link {
+ 	wl_if_t *wlif;
++#if LINUX_VERSION_CODE >= KERNEL_VERSION(4, 11, 0)
++	unsigned long last_rx;
++#endif
+ } priv_link_t;
+ 
+ #define WL_DEV_IF(dev)          ((wl_if_t*)((priv_link_t*)DEV_PRIV(dev))->wlif)
+@@ -2450,6 +2453,9 @@ wl_monitor(wl_info_t *wl, wl_rxsts_t *rxsts, void *p)
+ {
+ 	struct sk_buff *oskb = (struct sk_buff *)p;
+ 	struct sk_buff *skb;
++#if LINUX_VERSION_CODE >= KERNEL_VERSION(4, 11, 0)
++	priv_link_t *priv_link;
++#endif
+ 	uchar *pdata;
+ 	uint len;
+ 
+@@ -2916,7 +2922,13 @@ wl_monitor(wl_info_t *wl, wl_rxsts_t *rxsts, void *p)
+ 	if (skb == NULL) return;
+ 
+ 	skb->dev = wl->monitor_dev;
++#if LINUX_VERSION_CODE >= KERNEL_VERSION(4, 11, 0)
++	priv_link = MALLOC(wl->osh, sizeof(priv_link_t));
++	priv_link = netdev_priv(skb->dev);
++	priv_link->last_rx = jiffies;
++#else
+ 	skb->dev->last_rx = jiffies;
++#endif
+ #if LINUX_VERSION_CODE >= KERNEL_VERSION(2, 6, 22)
+ 	skb_reset_mac_header(skb);
+ #else
+diff --git a/src/wl/sys/wl_cfg80211_hybrid.c b/src/wl/sys/wl_cfg80211_hybrid.c
+index da36405..d3741eb 100644
+--- a/src/wl/sys/wl_cfg80211_hybrid.c
++++ b/src/wl/sys/wl_cfg80211_hybrid.c
+@@ -53,7 +53,11 @@ u32 wl_dbg_level = WL_DBG_ERR;
+ #endif
+ 
+ static s32 wl_cfg80211_change_iface(struct wiphy *wiphy, struct net_device *ndev,
++#if LINUX_VERSION_CODE >= KERNEL_VERSION(4, 12, 0)
++           enum nl80211_iftype type, struct vif_params *params);
++#else
+            enum nl80211_iftype type, u32 *flags, struct vif_params *params);
++#endif
+ #if LINUX_VERSION_CODE >= KERNEL_VERSION(3, 6, 0)
+ static s32
+ wl_cfg80211_scan(struct wiphy *wiphy,
+@@ -466,7 +470,11 @@ wl_dev_ioctl(struct net_device *dev, u32 cmd, void *arg, u32 len)
+ 
+ static s32
+ wl_cfg80211_change_iface(struct wiphy *wiphy, struct net_device *ndev,
++#if LINUX_VERSION_CODE >= KERNEL_VERSION(4, 12, 0)
++                         enum nl80211_iftype type,
++#else
+                          enum nl80211_iftype type, u32 *flags,
++#endif
+    struct vif_params *params)
+ {
+ 	struct wl_cfg80211_priv *wl = wiphy_to_wl(wiphy);
+@@ -2361,6 +2369,20 @@ wl_bss_roaming_done(struct wl_cfg80211_priv *wl, struct net_device *ndev,
+                     const wl_event_msg_t *e, void *data)
+ {
+ 	struct wl_cfg80211_connect_info *conn_info = wl_to_conn(wl);
++#if LINUX_VERSION_CODE >= KERNEL_VERSION(4, 12, 0)
++	struct cfg80211_bss *bss;
++	struct wlc_ssid *ssid;
++	ssid = &wl->profile->ssid;
++	bss = cfg80211_get_bss(wl_to_wiphy(wl), NULL, (s8 *)&wl->bssid,
++	ssid->SSID, ssid->SSID_len, WLAN_CAPABILITY_ESS, WLAN_CAPABILITY_ESS);
++	struct cfg80211_roam_info roam_info = {
++		.bss = bss,
++		.req_ie = conn_info->req_ie,
++		.req_ie_len = conn_info->req_ie_len,
++		.resp_ie = conn_info->resp_ie,
++		.resp_ie_len = conn_info->resp_ie_len,
++	};
++#endif
+ 	s32 err = 0;
+ 
+ 	wl_get_assoc_ies(wl);
+@@ -2368,12 +2390,17 @@ wl_bss_roaming_done(struct wl_cfg80211_priv *wl, struct net_device *ndev,
+ 	memcpy(&wl->bssid, &e->addr, ETHER_ADDR_LEN);
+ 	wl_update_bss_info(wl);
+ 	cfg80211_roamed(ndev,
++#if LINUX_VERSION_CODE >= KERNEL_VERSION(4, 12, 0)
++			&roam_info,
++#else
+ #if LINUX_VERSION_CODE > KERNEL_VERSION(2, 6, 39)
+ 			&wl->conf->channel,	 
+ #endif
+ 			(u8 *)&wl->bssid,
+ 			conn_info->req_ie, conn_info->req_ie_len,
+-			conn_info->resp_ie, conn_info->resp_ie_len, GFP_KERNEL);
++			conn_info->resp_ie, conn_info->resp_ie_len,
++#endif
++			GFP_KERNEL);
+ 	WL_DBG(("Report roaming result\n"));
+ 
+ 	set_bit(WL_STATUS_CONNECTED, &wl->status);
+diff -urNZ a/src/wl/sys/wl_linux.c b/src/wl/sys/wl_linux.c
+--- a/src/wl/sys/wl_linux.c	2015-09-18 22:47:30.000000000 +0000
++++ b/src/wl/sys/wl_linux.c	2018-01-31 22:52:10.859856221 +0000
+@@ -93,7 +93,11 @@
+
+ #include <wlc_wowl.h>
+
++#if LINUX_VERSION_CODE >= KERNEL_VERSION(4, 15, 0)
++static void wl_timer(struct timer_list *tl);
++#else
+ static void wl_timer(ulong data);
++#endif
+ static void _wl_timer(wl_timer_t *t);
+ static struct net_device *wl_alloc_linux_if(wl_if_t *wlif);
+
+@@ -2298,9 +2302,15 @@
+ }
+
+ static void
++#if LINUX_VERSION_CODE >= KERNEL_VERSION(4, 15, 0)
++wl_timer(struct timer_list *tl)
++{
++	wl_timer_t *t = from_timer(t, tl, timer);
++#else
+ wl_timer(ulong data)
+ {
+ 	wl_timer_t *t = (wl_timer_t *)data;
++#endif
+
+ 	if (!WL_ALL_PASSIVE_ENAB(t->wl))
+ 		_wl_timer(t);
+@@ -2352,9 +2362,13 @@
+
+ 	bzero(t, sizeof(wl_timer_t));
+
++#if LINUX_VERSION_CODE >= KERNEL_VERSION(4, 15, 0)
++	timer_setup(&t->timer, wl_timer, 0);
++#else
+ 	init_timer(&t->timer);
+ 	t->timer.data = (ulong) t;
+ 	t->timer.function = wl_timer;
++#endif
+ 	t->wl = wl;
+ 	t->fn = fn;
+ 	t->arg = arg;
+diff --git a/src/shared/linux_osl.c b/src/shared/linux_osl.c
+index 6157d18..8237ec7 100644
+--- a/src/shared/linux_osl.c
++++ b/src/shared/linux_osl.c
+@@ -942,7 +942,7 @@ osl_getcycles(void)
+ void *
+ osl_reg_map(uint32 pa, uint size)
+ {
+-	return (ioremap_nocache((unsigned long)pa, (unsigned long)size));
++	return (ioremap((unsigned long)pa, (unsigned long)size));
+ }
+ 
+ void
+diff --git a/src/wl/sys/wl_linux.c b/src/wl/sys/wl_linux.c
+index 0d05100..2ed1f0d 100644
+--- a/src/wl/sys/wl_linux.c
++++ b/src/wl/sys/wl_linux.c
+@@ -582,7 +582,7 @@ wl_attach(uint16 vendor, uint16 device, ulong regs,
+ 	}
+ 	wl->bcm_bustype = bustype;
+ 
+-	if ((wl->regsva = ioremap_nocache(dev->base_addr, PCI_BAR0_WINSZ)) == NULL) {
++	if ((wl->regsva = ioremap(dev->base_addr, PCI_BAR0_WINSZ)) == NULL) {
+ 		WL_ERROR(("wl%d: ioremap() failed\n", unit));
+ 		goto fail;
+ 	}
+@@ -772,7 +772,7 @@ wl_pci_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
+ 	if ((val & 0x0000ff00) != 0)
+ 		pci_write_config_dword(pdev, 0x40, val & 0xffff00ff);
+ 		bar1_size = pci_resource_len(pdev, 2);
+-		bar1_addr = (uchar *)ioremap_nocache(pci_resource_start(pdev, 2),
++		bar1_addr = (uchar *)ioremap(pci_resource_start(pdev, 2),
+ 			bar1_size);
+ 	wl = wl_attach(pdev->vendor, pdev->device, pci_resource_start(pdev, 0), PCI_BUS, pdev,
+ 		pdev->irq, bar1_addr, bar1_size);
+@@ -3335,12 +3335,19 @@ wl_proc_write(struct file *filp, const char __user *buff, size_t length, loff_t
+ }
+ 
+ #if LINUX_VERSION_CODE >= KERNEL_VERSION(3, 10, 0)
++#if LINUX_VERSION_CODE >= KERNEL_VERSION(5, 6, 0)
++static struct proc_ops wl_fops = {
++        .proc_read     = wl_proc_read,
++        .proc_write    = wl_proc_write,
++};
++#else
+ static const struct file_operations wl_fops = {
+ 	.owner	= THIS_MODULE,
+ 	.read	= wl_proc_read,
+ 	.write	= wl_proc_write,
+ };
+ #endif
++#endif
+ 
+ static int
+ wl_reg_proc_entry(wl_info_t *wl)

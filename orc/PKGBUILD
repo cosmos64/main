@@ -1,33 +1,40 @@
 
 pkgname=orc
-pkgver=0.4.26
+pkgver=0.4.32
 pkgrel=1
 pkgdesc="The Optimized Inner Loops Runtime Compiler"
 arch=('x86_64')
 license=('custom')
-url="http://cgit.freedesktop.org/gstreamer/orc/"
+url="https://gitlab.freedesktop.org/gstreamer/orc"
 depends=('glibc')
-makedepends=('valgrind')
+makedepends=('valgrind' 'meson' 'ninja' 'gtk-doc')
 options=('!libtool')
-source=("http://gstreamer.freedesktop.org/src/orc/${pkgname}-${pkgver}.tar.xz")
-md5sums=('8e9bef677bae289d3324d81c337a4507')
+source=("https://gstreamer.freedesktop.org/src/orc/${pkgname}-${pkgver}.tar.xz")
+sha256sums=('a66e3d8f2b7e65178d786a01ef61f2a0a0b4d0b8370de7ce134ba73da4af18f0')
 
 build () {
-    cd ${pkgname}-${pkgver}
+  mkdir -p build
+  cd build
+  
+  export LANG=en_US.UTF-8
     
-    ./configure --prefix=/usr --disable-static
-    make
+  meson ../${pkgname}-${pkgver} \
+    --prefix=/usr \
+    --buildtype=release \
+    --libexecdir=/usr/lib \
+    -Dorc-backend=all
+  ninja
 }
 
 check() {
-    cd ${pkgname}-${pkgver}
-    
-    make check
+  cd build
+  
+  meson test
 }
     
 package() {
-    cd ${pkgname}-${pkgver}
-    make DESTDIR=${pkgdir} install
+  cd build
+  DESTDIR=${pkgdir} ninja install
     
-    install -Dm644 COPYING ${pkgdir}/usr/share/licenses/${pkgname}/LICENSE
+  install -Dm644 ../${pkgname}-${pkgver}/COPYING ${pkgdir}/usr/share/licenses/${pkgname}/LICENSE
 }

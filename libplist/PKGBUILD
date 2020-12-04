@@ -1,20 +1,22 @@
 
 pkgname=libplist
-pkgver=1.12
-pkgrel=2
+pkgver=2.2.0
+pkgrel=1
 pkgdesc="A library to handle Apple Property List format whereas it's binary or XML"
-url="http://libimobiledevice.org/"
+url="https://libimobiledevice.org/"
 arch=('x86_64')
 license=('GPL2' 'LGPL2.1')
 depends=('glib2' 'libxml2')
-makedepends=('python2')
+makedepends=('python3') #-cython')
 options=('!makeflags')
-source=("http://www.libimobiledevice.org/downloads/$pkgname-$pkgver.tar.bz2")
-md5sums=('8b04b0f09f2398022dcd4fba75012997')
+source=("https://www.libimobiledevice.org/downloads/${pkgname}-${pkgver}.tar.bz2")
+#source=("https://github.com/libimobiledevice/libplist/archive/${pkgver}.tar.gz")
+md5sums=('63cc49401521662c94cd4107898c744c')
 
 build() {
   cd ${pkgname}-${pkgver}
   
+  #./autogen.sh
   ./configure --prefix=/usr  
   make
 }

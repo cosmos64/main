@@ -1,27 +1,27 @@
 
 pkgname=t1utils
-pkgver=1.39
+pkgver=1.42
 pkgrel=1
-pkgdesc="A collection of simple Type 1 font manipulation programs"
+pkgdesc="Six free UNIX/Windows command-line tools for dealing with Type 1 fonts."
 arch=('x86_64')
-url="http://www.lcdf.org/~eddietwo/type/#t1utils"
+url="https://www.lcdf.org/~eddietwo/type/#t1utils"
 license=("custom")
 depends=('glibc')
-source=("http://www.lcdf.org/~eddietwo/type/$pkgname-$pkgver.tar.gz"
-	'LICENSE')
-md5sums=('88837df02d69ed9d0f61c44ce5049cf4'
+source=("https://www.lcdf.org/~eddietwo/type/${pkgname}-${pkgver}.tar.gz"
+        'LICENSE')
+md5sums=('acc4bc832bafbdc059fb3b0cad8c3ab0'
          '5a1334c824d21f0314c831f9fd19a587')
 
 build() {
-  cd "$srcdir/$pkgname-$pkgver"
+  cd ${pkgname}-${pkgver}
   
   ./configure --prefix=/usr
   make
 }
 
 package() {
-  cd "$srcdir/$pkgname-$pkgver"
-  make DESTDIR="$pkgdir" install
+  cd ${pkgname}-${pkgver}
+  make DESTDIR=${pkgdir} install
   
-  install -D -m644 "$srcdir/LICENSE" "$pkgdir/usr/share/licenses/$pkgname/LICENSE"
+  install -D -m644 ../LICENSE ${pkgdir}/usr/share/licenses/${pkgname}/LICENSE
 }

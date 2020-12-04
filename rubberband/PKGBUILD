@@ -1,18 +1,21 @@
 
 pkgname=rubberband
-pkgver=1.8.1
-pkgrel=3
+pkgver=1.9.0
+pkgrel=1
 pkgdesc="Time-stretching and pitch-shifting audio library and utility"
 arch=('x86_64')
-url="http://www.breakfastquay.com/rubberband/"
+url="https://www.breakfastquay.com/rubberband/"
 license=('GPL')
 depends=('libsamplerate' 'fftw' 'vamp-plugin-sdk')
 makedepends=('ladspa')
-source=("http://code.breakfastquay.com/attachments/download/34/${pkgname}-${pkgver}.tar.bz2")
-md5sums=('6c2b4e18a714bcc297d0db81a10f9348')
+source=("https://code.breakfastquay.com/attachments/download/34/${pkgname}-${pkgver}.tar.bz2"
+        "https://github.com/breakfastquay/rubberband/commit/419a9bcf7066473b0d31e9a8a81fe0b2a8e41fed.diff")
+md5sums=('a203a53ef14f23bd4344f4b32514ed62'
+         '26bb1bf86fcfbd897a665ead4aec4613')
 
 build() {
   cd ${pkgname}-${pkgver}
+  #patch -p1 -i ${srcdir}/419a9bcf7066473b0d31e9a8a81fe0b2a8e41fed.diff
 
   ./configure --prefix=/usr
   make

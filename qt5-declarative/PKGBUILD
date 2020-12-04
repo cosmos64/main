@@ -1,34 +1,37 @@
 
-pkgname=('qt5-declarative' 'qt5-declarative-docs')
-pkgver=5.7.0
-subver=5.7.0
-_pkgver=5.7
-pkgrel=3
-pkgdesc=('A cross-platform application and UI framework, QtDeclarative files')
+# include global config
+source ../_buildscripts/${current_repo}-${_arch}-cfg.conf
+
+pkgname=qt5-declarative
+pkgver=${qtver}
+subver=${subver}
+_pkgver=${_qtver}
+pkgrel=1
+pkgdesc="A cross-platform application and UI framework, QtDeclarative files"
 arch=('x86_64')
-url='http://qt.nokia.com/'
+url='https://www.qt.io/'
 license=('GPL3' 'LGPL' 'FDL' 'custom')
-makedepends=('qt5-xmlpatterns' 'mesa' 'python2' 'qt5-tools')
-options=('!libtool')
-_pkgfqn="qtdeclarative-opensource-src-${subver}"
-source=("https://download.qt-project.org/official_releases/qt/${_pkgver}/${pkgver}/submodules/$_pkgfqn.tar.xz")
+depends=('qt5-base' 'mesa')
+makedepends=('python3' 'vulkan-headers')
+options=('!libtool' 'debug')
+groups=('qt5')
+_pkgfqn="qtdeclarative-everywhere-src-${subver}"
+source=("${_qtmirror}/${_pkgver}/${subver}/submodules/$_pkgfqn.tar.xz"
+        "https://github.com/qt/qtdeclarative/commit/c8bba05dc54231dbc5dc859f125d64b640e25a41.diff")
 #source=("https://download.qt-project.org/development_releases/qt/${_pkgver}/${subver}/submodules/$_pkgfqn.tar.xz")
-md5sums=('0d9e461aa54dba4793253fa2eb501f9b')
+md5sums=(`grep ${_pkgfqn}.tar.xz ../qt.md5 | cut -d" " -f1`
+         '96402a66b9e8f5117fa4368956eda968')
 
 build() {
     cd $srcdir/$_pkgfqn
-    #patch -p1 -i $srcdir/0001-Scene-Graph-Fixed-memory-leak-in-QSGBatchRenderer-Re.patch
+    #patch -p1 -i $srcdir/c8bba05dc54231dbc5dc859f125d64b640e25a41.diff
 
     /usr/lib/qt5/bin/qmake
     make
-    make docs
+    #make docs
 }
 
-package_qt5-declarative() {
-    pkgdesc=('A cross-platform application and UI framework, QtDeclarative files')
-    depends=('qt5-xmlpatterns' 'mesa')
-    groups=('qt5')
-    
+package() {
     cd $srcdir/$_pkgfqn
     make INSTALL_ROOT=$pkgdir install
     
@@ -38,11 +41,3 @@ package_qt5-declarative() {
     done
 }
 
-package_qt5-declarative-docs() {
-    pkgdesc=('Documentation files for QtDeclarative')
-    depends=('qt5-base')
-    groups=('qt5-docs')
-    
-    cd $srcdir/$_pkgfqn
-    make INSTALL_ROOT=$pkgdir install_docs
-}

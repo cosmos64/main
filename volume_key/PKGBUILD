@@ -1,0 +1,31 @@
+
+pkgname=volume_key
+pkgver=0.3.12
+pkgrel=4
+pkgdesc="Library for manipulating storage volume encryption keys and storing them separately from volumes"
+arch=('x86_64')
+url="https://pagure.io/volume_key"
+license=('GPL')
+depends=('cryptsetup' 'nss' 'util-linux' 'gpgme' 'python3')
+source=("https://releases.pagure.org/volume_key/${pkgname}-${pkgver}.tar.xz"
+        "https://pagure.io/volume_key/c/ecef526a51c5a276681472fd6df239570c9ce518.patch")
+sha256sums=('6ca3748fc1dad22c450bbf6601d4e706cb11c5e662d11bb4aeb473a9cd77309b'
+            'f544ec62d74a1c739978cdc79cfcb95243cf06c0f68f435c6cc1256fc7ca3ab3')
+
+build() {
+    cd ${pkgname}-${pkgver}
+    # needed with cryptsetup 2.0.0
+    #patch -p1 -i ${srcdir}/ecef526a51c5a276681472fd6df239570c9ce518.patch
+    
+    ./configure --prefix=/usr \
+        --with-python3 \
+        --without-python
+    make
+}
+
+package() {
+    cd ${pkgname}-${pkgver}
+
+    make DESTDIR=${pkgdir}/ install
+}
+ 

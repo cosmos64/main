@@ -1,33 +1,33 @@
 
 pkgname=xorg-res-utils
-pkgver=1.0.6
-pkgrel=2
+pkgver=1.0.8
+pkgrel=1
 pkgdesc="X.Org X11 resource utilities"
 arch=('x86_64')
-url="http://xorg.freedesktop.org/"
+url="https://xorg.freedesktop.org/"
 license=('custom')
 depends=('libxaw')
 makedepends=('pkgconfig')
 groups=('xorg')
-source=("${url}/releases/individual/app/appres-1.0.4.tar.bz2"
-        "${url}/releases/individual/app/editres-1.0.6.tar.bz2"
-        "${url}/releases/individual/app/listres-1.0.3.tar.bz2"
-        "${url}/releases/individual/app/viewres-1.0.4.tar.bz2"
+source=("https://xorg.freedesktop.org/releases/individual/app/appres-1.0.5.tar.bz2"
+        "https://xorg.freedesktop.org/releases/individual/app/editres-1.0.7.tar.bz2"
+        "https://xorg.freedesktop.org/releases/individual/app/listres-1.0.4.tar.bz2"
+        "https://xorg.freedesktop.org/releases/individual/app/viewres-1.0.6.tar.bz2"
         'LICENSE.listres'
         'LICENSE.viewres')
-md5sums=('ed598f0599d726963c1bdfdc691960d9'
-         '623322610e4040393e0ff2a69e6612cd'
-         '4e8edcc03001203c101e79d880d55762'
-         'e4651e55dccb0ae234e49bdc0b984fc9'
-         '9c9b17ae5e9be0c570dabe9e54f54f6d'
-         '9c9b17ae5e9be0c570dabe9e54f54f6d')
+sha256sums=('ffad893712c81943b919e3cbfe46fc65259cc0d9eb96d5e658670e3fbb265928'
+            '089ad34628e55a779b97e369f55fb12caefc96d684b508d9022eb9e12b775c11'
+            '6a1229f478796e141d6658762f432ebbe1f6083b27550847d52239b3f7ec2b10'
+            '11c15db02066c1d5fc3febf9b185d16c1112f87e37c4b101a484dcefffb80934'
+            'c4023f9b75d3e51b0f4298785c1a6f1b7b1eca7155e267f22cb5c9a09edf67cd'
+            'c4023f9b75d3e51b0f4298785c1a6f1b7b1eca7155e267f22cb5c9a09edf67cd')
 
 build() {
   cd ${srcdir}
   
   for i in *; do
-    if [ -d "${i}" ]; then
-      pushd "${i}"
+    if [ -d ${i} ]; then
+      pushd ${i}
       ./configure --prefix=/usr --mandir=/usr/share/man --disable-xprint
       make
       popd
@@ -39,14 +39,14 @@ package() {
   cd ${srcdir}
   
   for i in *; do
-    if [ -d "${i}" ]; then
-      pushd "${i}"
+    if [ -d ${i} ]; then
+      pushd ${i}
       make DESTDIR=${pkgdir} install
       install -D -m644 COPYING ${pkgdir}/usr/share/licenses/${pkgname}/LICENSE.${i%-*}
       popd
     fi
   done
-  #Replacing stub license files
-  install -D -m644 "${srcdir}/LICENSE.listres" "${pkgdir}/usr/share/licenses/${pkgname}/LICENSE.listres"
-  install -D -m644 "${srcdir}/LICENSE.viewres" "${pkgdir}/usr/share/licenses/${pkgname}/LICENSE.viewres"
+
+  install -D -m644 LICENSE.listres ${pkgdir}/usr/share/licenses/${pkgname}/LICENSE.listres
+  install -D -m644 LICENSE.viewres ${pkgdir}/usr/share/licenses/${pkgname}/LICENSE.viewres
 }

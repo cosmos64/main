@@ -1,14 +1,14 @@
 
 pkgname=aspell-pl
-pkgver=20160809
+pkgver=20201103
 pkgrel=1
 pkgdesc="Polish dictionary for aspell"
 arch=('x86_64')
-url="http://www.sjp.pl/slownik/en/"
+url="https://www.sjp.pl/slownik/en/"
 license=('GPL' 'LGPL' 'MPL')
 depends=('aspell')
-source=("http://sjp.pl/slownik/ort/sjp-aspell6-pl-6.0_${pkgver}-0.tar.bz2")
-md5sums=('16fa56c2ae72cdb165a596bcabfe0ba4')
+source=("https://sjp.pl/slownik/ort/sjp-aspell6-pl-6.0_${pkgver}-0.tar.bz2")
+md5sums=('08270fc3f2cb102c6c9e3571c18226bc')
  
 build() {
   cd aspell6-pl-6.0_${pkgver}-0

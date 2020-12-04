@@ -1,16 +1,16 @@
 
 pkgname=ccid
-pkgver=1.4.25
+pkgver=1.4.33
 pkgrel=1
 pkgdesc="Generic USB Chip/Smart Card Interface Devices driver"
 arch=('x86_64')
-url="http://pcsclite.alioth.debian.org/ccid.html"
+url="https://ccid.apdu.fr"
 license=('LGPL' 'GPL')
 depends=('pcsclite' 'libusbx' 'flex')
 makedepends=('pkg-config')
 backup=(etc/reader.conf.d/libccidtwin)
-source=("https://alioth.debian.org/frs/download.php/file/4187/${pkgname}-${pkgver}.tar.bz2")
-md5sums=('5ebb0a68564a384fd087023f52f1e35c')
+source=("https://ccid.apdu.fr/files/${pkgname}-${pkgver}.tar.bz2")
+md5sums=('b11907894ce2d345439635e2b967e7e5')
 
 build() {
   cd ${pkgname}-${pkgver}
@@ -26,7 +26,7 @@ package() {
   cd ${pkgname}-${pkgver}
 
   make DESTDIR=${pkgdir} install
-  # move the configuration file in /etc and create a symbolic link
+
   mv ${pkgdir}/usr/lib/pcsc/drivers/ifd-ccid.bundle/Contents/Info.plist ${pkgdir}/etc/libccid_Info.plist
   ln -s /etc/libccid_Info.plist ${pkgdir}/usr/lib/pcsc/drivers/ifd-ccid.bundle/Contents/Info.plist
   

@@ -1,16 +1,16 @@
 
 pkgname=gc
-pkgver=7.6.0
-_pkgver=7.6.0
+pkgver=8.0.4
+_pkgver=8.0.4
 pkgrel=1
 pkgdesc="A garbage collector for C and C++"
 arch=('x86_64')
-url="http://www.hboehm.info/gc/"
+url="https://www.hboehm.info/gc/"
 license=('GPL')
 depends=('gcc-libs' 'libatomic_ops')
 options=('!libtool')
-source=("http://www.hboehm.info/gc/gc_source/${pkgname}-${_pkgver}.tar.gz")
-md5sums=('bf46ccbdaccfa3186c2ab87191c8855a')
+source=("https://github.com/ivmai/bdwgc/releases/download/v${_pkgver}/${pkgname}-${_pkgver}.tar.gz")
+md5sums=('67a5093e2f9f381bd550aa891d00b54b')
 
 build() {
   cd ${pkgname}-${pkgver}

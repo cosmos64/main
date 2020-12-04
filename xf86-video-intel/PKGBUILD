@@ -1,38 +1,38 @@
 
 pkgname=xf86-video-intel
-pkgver=2.99.917.12
+pkgver=2.99.917.37
 pkgrel=1
-_commit=bf7316a4539afdf7a742d2b2ccbbaa5f27918255
+_commit=ad5540f6ecaec287c70259f0181e613561b716f6
 pkgdesc="X.org Intel i810/i830/i915/945G/G965+ video drivers"
 arch=('x86_64')
-url="http://xorg.freedesktop.org"
+url="https://gitlab.freedesktop.org/xorg/driver/xf86-video-intel"
 license=('custom')
 depends=('mesa' 'libxvmc' 'libpciaccess' 'libdrm' 'xcb-util' 'libxfixes' 'systemd'
-         'libxrandr' 'libxinerama' 'libxcursor' 'libxtst')
-makedepends=('xorg-server>=1.18.1' 'libx11' 'xf86driproto' 'glproto' 'libxrender'
-             'resourceproto' 'scrnsaverproto')
+         'libxrandr' 'libxinerama' 'libxcursor' 'libxtst' 'pixman' 'libxss')
+makedepends=('xorg-server' 'libx11' 'libxrender' 'xorgproto')
 options=('!libtool')
 groups=('xorg-drivers' 'xorg')
 install=xf86-video-intel.install
 #source=("http://xorg.freedesktop.org/releases/individual/driver/${pkgname}-${pkgver}.tar.bz2")
-source=("git://anongit.freedesktop.org/git/xorg/driver/xf86-video-intel.git#commit=${_commit}")
-md5sums=('SKIP')
+# check at https://cgit.freedesktop.org/xorg/driver/xf86-video-intel/
+source=("https://gitlab.freedesktop.org/xorg/driver/xf86-video-intel/-/archive/${_commit}/xf86-video-intel-${_commit}.tar.bz2")
+md5sums=('df6fba8783279460a8b4f5a27f3c60fc')
 
 build() {
-  cd ${pkgname}
+  cd ${pkgname}-${_commit}
 
   ./autogen.sh
   ./configure --prefix=/usr \
-              --libexecdir=/usr/lib \
-              --enable-dri \
-              --enable-sna \
-              --enable-uxa \
-              --with-default-accel=sna
+    --libexecdir=/usr/lib \
+    --with-default-dri=3 \
+    --enable-sna \
+    --enable-uxa \
+    --with-default-accel=sna
   make
 }
 
 package() {
-  cd ${pkgname}
+  cd ${pkgname}-${_commit}
   make DESTDIR=${pkgdir} install
   
   install -m755 -d ${pkgdir}/usr/share/licenses/${pkgname}

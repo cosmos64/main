@@ -1,21 +1,23 @@
-
+# pin at <45, see https://github.com/pypa/setuptools/issues/1458
 pkgname=python2-setuptools
-pkgver=28.7.1
+pkgver=44.1.1
 pkgrel=1
 pkgdesc="Easily download, build, install, upgrade, and uninstall Python packages"
 arch=('x86_64')
 license=('PSF')
 url="http://pypi.python.org/pypi/setuptools"
-depends=('python2')
-makedepends=('asciidoc') # 'python2-setuptools')
+depends=('python2-appdirs' 'python2-packaging')
+makedepends=('asciidoc' 'python2-pip')
 provides=('python2-distribute' 'setuptools')
 replaces=('python2-distribute' 'setuptools')
 conflicts=('python2-distribute')
 source=("https://github.com/pypa/setuptools/archive/v${pkgver}.tar.gz")
-md5sums=('61e59d268dfd84446d6f5e652aa30e4c')
+md5sums=('2922ead67497b1fba832569d9b5bae5b')
 
 build() {
    cd setuptools-${pkgver}
+   sed -i -e "s|^#\!.*/usr/bin/env python|#!/usr/bin/env python2|" setuptools/command/easy_install.py
+   sed -i '/pip.main(args)/d' bootstrap.py
    
    python2 bootstrap.py
    python2 setup.py build

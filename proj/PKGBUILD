@@ -1,19 +1,21 @@
 
 pkgname=proj
-pkgver=4.9.3
+pkgver=7.2.0
+_dataver=1.3
 pkgrel=1
 pkgdesc="Cartographic Projections library"
 arch=('x86_64')
-url="http://trac.osgeo.org/proj/"
+url="https://proj4.org/"
 license=('MIT')
+depends=('sqlite' 'libtiff')
 options=('!libtool')
-source=("http://download.osgeo.org/proj/${pkgname}-${pkgver}.tar.gz"
-        "http://download.osgeo.org/proj/${pkgname}-datumgrid-1.6.zip")
-md5sums=('d598336ca834742735137c5674b214a1'
-         '4dc75812515cfa744032bbf888c5caee')
+source=("https://download.osgeo.org/proj/${pkgname}-${pkgver}.tar.gz"
+        "https://download.osgeo.org/proj/${pkgname}-data-${_dataver}.tar.gz")
+md5sums=('12748b74e4d6c12ade32ec3ca68dafc7'
+         '7d202814fa70ff56f70fa4776a62b4f3')
 
 build() {
-  bsdtar -xzvf ${srcdir}/${pkgname}-datumgrid-1.6.zip -C ${srcdir}/proj-${pkgver}/nad
+  bsdtar -xzvf ${srcdir}/${pkgname}-data-${_dataver}.tar.gz -C ${srcdir}/proj-${pkgver}/data
   cd ${srcdir}/proj-${pkgver}
 
   ./configure --prefix=/usr

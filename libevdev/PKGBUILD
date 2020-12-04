@@ -1,15 +1,15 @@
 
 pkgname=libevdev
-pkgver=1.5.4
+pkgver=1.10.0
 pkgrel=1
 pkgdesc="Library for handling evdev kernel devices"
 arch=('x86_64')
-url="http://www.freedesktop.org/wiki/Software/libevdev/"
+url="https://www.freedesktop.org/wiki/Software/libevdev/"
 license=('custom:X11')
 depends=('glibc')
-makedepends=('python2' 'doxygen' 'linux-headers') 
-source=("http://freedesktop.org/software/libevdev/$pkgname-$pkgver.tar.xz")
-md5sums=('8f22027bd7a7ba19e6f2695f78e672b6')
+makedepends=('python3' 'doxygen' 'linux-headers') 
+source=("https://freedesktop.org/software/libevdev/${pkgname}-${pkgver}.tar.xz")
+sha256sums=('3522c26e2c148be0ad68ce26fbced408a4185dea90bfe8079dc82b8ace962d4a')
 
 build() {
    cd ${pkgname}-${pkgver}

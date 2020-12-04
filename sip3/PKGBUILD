@@ -1,31 +1,41 @@
 
 pkgname=sip3
 _pkgname=sip
-pkgver=4.18.1
-_pkgver=4.18.1
+pkgver=4.19.24
+_pkgver=4.19.24
 pkgrel=1
 pkgdesc="Tool that makes it easy to create Python3 bindings for C and C++ libraries"
 arch=('x86_64')
-url="http://www.riverbankcomputing.com/software/sip/"
+url="https://www.riverbankcomputing.com/software/sip/"
 license=('custom:"sip"')
-depends=('python3' 'gcc-libs' 'sip')
-source=("http://sourceforge.net/projects/pyqt/files/sip/sip-${pkgver}/${_pkgname}-${pkgver}.tar.gz")
+depends=('python3' 'gcc-libs')
+source=("https://www.riverbankcomputing.com/static/Downloads/sip/${pkgver}/${_pkgname}-${pkgver}.tar.gz")
 #source=("http://www.riverbankcomputing.com/static/Downloads/sip4/sip-${pkgver}.tar.gz")
-md5sums=('9d664c33e8d0eabf1238a7ff44a399e9')
+sha1sums=('bc509d2a9999e454751f1ccb674d01d204c09286')
 
 build() {
-  cd ${_pkgname}-${pkgver} 
-
-  python3 configure.py
+  mkdir -p build
+  mkdir -p build_pyqt
+  
+  cd build
+  python3 ../${_pkgname}-${pkgver}/configure.py
+  make
+  
+  cd ..
+  
+  cd build_pyqt
+  python3 ../${_pkgname}-${pkgver}/configure.py  --sip-module PyQt5.sip
   make
 }
 
 package() {
-  cd ${_pkgname}-${pkgver}
-  make DESTDIR=${pkgdir} install -C siplib
+  cd build
+  make DESTDIR=${pkgdir} install
   
-  install -Dm644 sipconfig.py ${pkgdir}/usr/lib/python3.5/site-packages/sipconfig.py
-  install -Dm644 sipdistutils.py ${pkgdir}/usr/lib/python3.5/site-packages/sipdistutils.py
+  cd ..
   
-  install -Dm644 LICENSE ${pkgdir}/usr/share/licenses/${pkgname}/LICENSE
+  cd build_pyqt
+  make DESTDIR=${pkgdir} install
+  
+  install -Dm644 ../${_pkgname}-${pkgver}/LICENSE ${pkgdir}/usr/share/licenses/${pkgname}/LICENSE
 }

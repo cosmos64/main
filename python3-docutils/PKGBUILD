@@ -1,0 +1,30 @@
+
+pkgname=python3-docutils
+_pkgname=docutils
+pkgver=0.16
+pkgrel=2
+pkgdesc="Set of tools for processing plaintext docs into formats such as HTML, XML, or LaTeX"
+arch=('x86_64')
+url="http://docutils.sourceforge.net"
+license=('custom')
+depends=('python3')
+source=("https://files.pythonhosted.org/packages/source/D/Docutils/${_pkgname}-${pkgver}.tar.gz")
+sha256sums=('c2de3a60e9e7d07be26b7f2b00ca0309c207e06c100f9cc2a94931fc75a478fc')
+
+build() {
+  cd ${_pkgname}-${pkgver}
+  
+  python3 setup.py build
+}
+
+package() {
+  cd ${_pkgname}-${pkgver}
+  python3 setup.py install --root=${pkgdir} --optimize=1
+
+  for _f in ${pkgdir}/usr/bin/*.py; do
+      ln -s $(basename $_f) ${pkgdir}/usr/bin/$(basename $_f .py)
+  done
+
+  install -D -m644 COPYING.txt ${pkgdir}/usr/share/licenses/${pkgname}/COPYING.txt
+  install -D -m644 licenses/python* ${pkgdir}/usr/share/licenses/${pkgname}/
+}

@@ -1,29 +1,37 @@
 
 pkgname=openal
-pkgver=1.17.2
+pkgver=1.21.0
 pkgrel=1
 pkgdesc="OpenAL is a cross-platform 3D audio library for use with OpenGL"
 arch=('x86_64')
-url="http://www.openal.org/"
+url="https://openal-soft.org/"
 license=('LGPL')
 depends=('glibc')
-makedepends=('alsa-lib' 'sdl' 'cmake' 'pulseaudio')
+makedepends=('alsa-lib' 'sdl2' 'cmake' 'pulseaudio' 'qt5-base')
 options=('!libtool')
-source=("http://kcat.strangesoft.net/openal-releases/$pkgname-soft-${pkgver}.tar.bz2")
-md5sums=('1764e0d8fec499589b47ebc724e0913d')
+source=("https://openal-soft.org/openal-releases/${pkgname}-soft-${pkgver}.tar.bz2"
+        "https://github.com/kcat/openal-soft/commit/d4f3490a880f779f460332689a396ade69840f50.diff")
+md5sums=('332dc0ead285887a3da5ec6bc725fdcd'
+         '11d80b1b3d70e3bb7e470bfdc632b8b9')
 
+prepare() {
+  cd ${pkgname}-soft-${pkgver}
+  # https://github.com/qTox/qTox/issues/4486
+  #patch -p1 -i ${srcdir}/d4f3490a880f779f460332689a396ade69840f50.diff
+}
+         
 build() {
-  cd ${srcdir}/${pkgname}-soft-${pkgver}/build
+  cd ${pkgname}-soft-${pkgver}/build
   
   cmake \
     -DCMAKE_INSTALL_PREFIX=/usr \
-    -DCMAKE_BUILD_TYPE=Release ..
+    -DCMAKE_BUILD_TYPE=Release \
+    -DCMAKE_INSTALL_LIBDIR=lib ..
   make
 }
 
 package() {
-  cd "$srcdir/$pkgname-soft-$pkgver"
-  make -C build DESTDIR="$pkgdir/" install
+  cd ${pkgname}-soft-${pkgver}
   
-  install -t "$pkgdir/usr/share/openal" env-vars.txt hrtf.txt
+  make -C build DESTDIR=${pkgdir}/ install
 }

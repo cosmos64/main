@@ -1,39 +1,57 @@
 
+# fails to find perl bindings without running -make generate- in gdal/swig/perl on error
 pkgname=gdal
-pkgver=2.1.1
-pkgrel=3
+pkgver=3.2.0
+_pkgver=3.2.0
+pkgrel=2
 pkgdesc="A translator library for raster geospatial data formats"
 arch=('x86_64')
-url="http://www.gdal.org/"
+url="https://www.gdal.org/"
 license=('custom')
 depends=('curl' 'geos' 'giflib' 'hdf5' 'libgeotiff' 'libjpeg-turbo' 'libpng' 'libtiff' 'netcdf'
-         'poppler' 'python2-numpy' 'sqlite3' 'libmariadbclient' 'postgresql-libs' 'cfitsio'
-         'libspatialite' 'unixodbc')
+         'poppler' 'python3-numpy' 'sqlite3' 'mariadb' 'postgresql-libs' 'cfitsio' 'unixodbc'
+         'json-c' 'libspatialite' 'proj')
 makedepends=('perl' 'swig')
 options=('!libtool' '!makeflags')
-source=("http://download.osgeo.org/gdal/${pkgver}/${pkgname}-${pkgver}.tar.gz")
-md5sums=('2a7037c5b30063cecfa104a562c9c07e')
+provides=('python3-gdal')
+replaces=('python3-gdal')
+conflicts=('python3-gdal')
+source=("https://download.osgeo.org/gdal/${pkgver}/${pkgname}-${pkgver}.tar.xz"
+#source=("https://github.com/OSGeo/gdal/archive/v${_pkgver}.tar.gz"
+        "https://github.com/OSGeo/gdal/commit/2b863dbabdc2a7d724f9fdf3e6ff20a142b619f6.diff")
+md5sums=('6c573e09acce89cef7853ca58789871c'
+         '5bc7a5e048a6a96d9f95d9ea480b7f5b')
+
+prepare() {
+  cd ${pkgname}-${_pkgver}
+  # poppler 20.08.0 needed
+  #patch -p1 -i ${srcdir}/2b863dbabdc2a7d724f9fdf3e6ff20a142b619f6.diff
+}
 
 build() {
-  export CFLAGS="$CFLAGS -fno-strict-aliasing"
-  export LDFLAGS="$LDFLAGS -Wl,--as-needed"
+  cd ${pkgname}-${_pkgver}
 
-  cd ${pkgname}-${pkgver}
-
-  ./configure --prefix=/usr --with-netcdf --with-libtiff --with-sqlite3 \
-              --with-geotiff --with-mysql --with-python --with-curl \
-              --with-hdf5 --with-perl --with-geos --with-png \
-              --with-poppler --with-spatialite
-
-  sed -i 's/PY_HAVE_SETUPTOOLS=1/PY_HAVE_SETUPTOOLS=/g' ./GDALmake.opt
-  sed -i 's/EXE_DEP_LIBS/KILL_EXE_DEP_LIBS/' apps/GNUmakefile
-  #install -d ${pkgdir}/usr/lib/python2.7/site-packages/
+  ./configure --prefix=/usr \
+    --sysconfdir=/etc \
+    --with-netcdf \
+    --with-libtiff \
+    --with-sqlite3 \
+    --with-geotiff \
+    --with-mysql \
+    --with-python=/usr/bin/python3 \
+    --with-curl \
+    --with-hdf5 \
+    --with-perl \
+    --with-geos \
+    --with-png \
+    --with-poppler \
+    --with-spatialite
 
   make
 }
 
 package () {
-  cd ${pkgname}-${pkgver}
+  cd ${pkgname}-${_pkgver}
   make DESTDIR=${pkgdir} install
 
   install -D -m644 LICENSE.TXT ${pkgdir}/usr/share/licenses/${pkgname}/LICENSE

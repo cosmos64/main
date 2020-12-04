@@ -1,26 +1,33 @@
 
 pkgname=gtk-doc
-pkgver=1.25
+pkgver=1.33.1
+_pkgver=1.33
 pkgrel=1
 pkgdesc="Documentation tool for public library API"
 arch=('x86_64')
+url="https://gitlab.gnome.org/GNOME/gtk-doc"
 license=('GPL' 'FDL')
-depends=('docbook-xsl' 'perl')
-makedepends=('pkgconfig' 'jade' 'itstool')
-url="http://www.gtk.org/gtk-doc/"
-source=("http://ftp.gnome.org/pub/gnome/sources/${pkgname}/${pkgver}/${pkgname}-${pkgver}.tar.xz")
-md5sums=('0dc6570953112a464a409fb99258ccbc')
+depends=('docbook-xsl' 'python3-pygments' 'python3-lxml')
+makedepends=('pkgconfig' 'meson' 'ninja')
+source=("https://ftp.gnome.org/pub/gnome/sources/gtk-doc/${_pkgver}/${pkgname}-${pkgver}.tar.xz")
+sha256sums=('a5cfed2a0b73a09b796fff80ad6d8f040ab2b2655bdc941ac207ffe6d9c10f10')
 
 build() {
-  cd ${pkgname}-${pkgver}
-  
-  ./configure --prefix=/usr
-  make
+    mkdir -p build
+    cd build
+
+    meson ../${pkgname}-${pkgver} \
+        --prefix=/usr \
+        --buildtype=release \
+        -Dyelp_manual=false \
+        -Dtests=false
+    ninja
 }
 
 package() {
-  cd ${pkgname}-${pkgver}
-  
-  make DESTDIR=${pkgdir} install
+    cd build
+
+    DESTDIR=${pkgdir} ninja install
 }
+
 

@@ -1,17 +1,17 @@
 
 pkgname=octave
-pkgver=4.0.3
-pkgrel=3
+pkgver=6.1.0
+pkgrel=1
 pkgdesc="A high-level language, primarily intended for numerical computations."
 arch=('x86_64')
-url="http://www.octave.org"
+url="https://www.octave.org"
 license=('GPL')
-depends=('fftw' 'curl' 'graphicsmagick' 'glpk' 'hdf5' 'gcc-libs' 'qhull' 'fltk'
-         'arpack' 'suitesparse' 'gperf' 'glu' 'gnuplot' 'gl2ps' 'ghostscript') # 'qscintilla-qt5')
-makedepends=('texlive-core' 'gcc-fortran' 'python2')
+depends=('fftw' 'curl' 'graphicsmagick' 'glpk' 'hdf5' 'gcc-libs' 'qhull' 'fltk' 'libsndfile'
+         'arpack' 'suitesparse' 'gperf' 'glu' 'gnuplot' 'gl2ps' 'ghostscript' 'qscintilla-qt5')
+makedepends=('texlive-core' 'gcc-fortran' 'qt5-tools')
 options=('!emptydirs')
-source=("ftp://ftp.gnu.org/gnu/octave/octave-$pkgver.tar.xz")
-md5sums=('73b140bc69ac21cfaa3e473b91b6842b')
+source=("https://ftp.gnu.org/gnu/octave/octave-${pkgver}.tar.lz")
+md5sums=('350315cf2bf16169b8710e70154c86ad')
 
 build() {
   cd ${pkgname}-${pkgver}
@@ -23,8 +23,8 @@ build() {
        --enable-shared \
        --disable-static \
        --with-quantum-depth=16 \
-       --with-umfpack="-lumfpack -lsuitesparseconfig" 
-       #MOC=moc UIC=uic RCC=rcc
+       --with-umfpack="-lumfpack -lsuitesparseconfig" \
+       --disable-docs
 
   LANG=C make
 }
@@ -37,6 +37,4 @@ package(){
   # add path to ld.so.conf.d
   install -d ${pkgdir}/etc/ld.so.conf.d
   echo /usr/lib/${pkgname}/${pkgver} > ${pkgdir}/etc/ld.so.conf.d/${pkgname}.conf
-  # remove .desktop until ported to Qt 5
-  rm ${pkgdir}/usr/share/applications/www.octave.org-octave.desktop
 }

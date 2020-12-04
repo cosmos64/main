@@ -1,52 +1,52 @@
 
 pkgname=xorg-utils
-pkgver=7.9
+pkgver=8.0
 pkgrel=2
 pkgdesc="Collection of client utilities used to query the X server"
 arch=('x86_64')
-url="http://xorg.freedesktop.org/"
+url="https://xorg.freedesktop.org/"
 license=('custom')
-depends=('libxxf86dga' 'libxi' 'libxtst' 'libxinerama' 'libxv' 'libdmx' 'libxft' 'libxaw>=1.0.6'
-         'libgl' 'libxcomposite' 'xorg-util-macros' 'xcb-util' 'libxrandr')
-makedepends=('pkgconfig' 'mesa' 'glproto' 'xproto')
+depends=('libxi' 'libxtst' 'libxinerama' 'libxv' 'libdmx' 'libxft' 'libxaw'
+         'libglvnd' 'libxcomposite' 'xorg-util-macros' 'xcb-util' 'libxrandr' 'libxkbfile')
+makedepends=('pkgconfig' 'mesa' 'xorgproto')
 groups=('xorg')
-source=("${url}/releases/individual/app/xdpyinfo-1.3.2.tar.bz2"
-        "${url}/releases/individual/app/xdriinfo-1.0.5.tar.bz2"
-        "${url}/releases/individual/app/xev-1.2.2.tar.bz2"
-        "${url}/releases/individual/app/xfd-1.1.2.tar.bz2"
-        "${url}/releases/individual/app/xfontsel-1.0.5.tar.bz2"
-        "${url}/releases/individual/app/xlsatoms-1.1.2.tar.bz2"
-        "${url}/releases/individual/app/xlsclients-1.1.3.tar.bz2"
-        "${url}/releases/individual/app/xlsfonts-1.0.5.tar.bz2"
-        "${url}/releases/individual/app/xprop-1.2.1.tar.bz2"
-        "${url}/releases/individual/app/xvinfo-1.1.3.tar.bz2"
-        "${url}/releases/individual/app/xwininfo-1.1.3.tar.bz2"
+source=("https://xorg.freedesktop.org/releases/individual/app/xdpyinfo-1.3.2.tar.bz2"
+        "https://xorg.freedesktop.org/releases/individual/app/xdriinfo-1.0.6.tar.bz2"
+        "https://xorg.freedesktop.org/releases/individual/app/xev-1.2.4.tar.bz2"
+        "https://xorg.freedesktop.org/releases/individual/app/xfd-1.1.3.tar.bz2"
+        "https://xorg.freedesktop.org/releases/individual/app/xfontsel-1.0.6.tar.bz2"
+        "https://xorg.freedesktop.org/releases/individual/app/xlsatoms-1.1.3.tar.bz2"
+        "https://xorg.freedesktop.org/releases/individual/app/xlsclients-1.1.4.tar.bz2"
+        "https://xorg.freedesktop.org/releases/individual/app/xlsfonts-1.0.6.tar.bz2"
+        "https://xorg.freedesktop.org/releases/individual/app/xprop-1.2.5.tar.bz2"
+        "https://xorg.freedesktop.org/releases/individual/app/xvinfo-1.1.4.tar.bz2"
+        "https://xorg.freedesktop.org/releases/individual/app/xwininfo-1.1.5.tar.bz2"
         'LICENSE.xdpyinfo' 'LICENSE.xfd' 'LICENSE.xlsclients' 
         'LICENSE.xprop' 'LICENSE.xwininfo' 'LICENSE.xev' 
         'LICENSE.xlsatoms' 'LICENSE.xlsfonts' 'LICENSE.xvinfo')
-md5sums=('8809037bd48599af55dad81c508b6b39'
-         'fceddaeb08e32e027d12a71490665866'
-         '249bdde90f01c0d861af52dc8fec379e'
-         'f19de745d181f5547ed59d6d9ed7a588'
-         'a40302b88c599b63e3d3d412e02871e6'
-         '5dcb6e6c4b28c8d7aeb45257f5a72a7d'
-         '9fbf6b174a5138a61738a42e707ad8f5'
-         '6f5711bef8c765857a0887a91476283b'
-         'd5529dc8d811efabd136ca2d8e857deb'
-         '558360176b718dee3c39bc0648c0d10c'
-         'b777bafb674555e48fd8437618270931'
-         'b43f731a9e2684728230ce8e33f63228'
-         '9e8a82b7e9898f36c378b80509f170a6'
-         '9e8a82b7e9898f36c378b80509f170a6'
-         '801f9850b29dad506e995d011efe2914'
-         '1c47d00801594a0e251694d70c7fb0b8'
-         'e84310edd65e120d85914350c795bfac'
-         '9ee99bda91248e945186090905db25d8'
-         '345d6e65d71fdde292cc27f93c15e4a1'
-         '67ea6bb3b11620c82ce4d24e78b4a0a9')
+sha256sums=('30238ed915619e06ceb41721e5f747d67320555cc38d459e954839c189ccaf51'
+            'd9ccd2c3e87899417acc9ea1f3e319a4198112babe1dc711273584f607449d51'
+            'd700e08bfe751ed2dbf802baa204b056d0e49348b6eb3c6f9cb035d8ae4885e2'
+            '192f938ba5830e84cc807d8ead2ad9655b43eaed6500c830f3e083aad10ed958'
+            '25aa0b7c4262f5e99c07c2b96e00e4eb25b7e53f94fa803942af9d0e8da3001c'
+            '57868f958c263976727881f3078e55b86b4a109dc578d2b92f5c6d690850a382'
+            '773f2af49c7ea2c44fba4213bee64325875c1b3c9bc4bbcd8dac9261751809c1'
+            '89b80b3a030006ab6cef717be286c12f2477894b227158b1e6133274f6ebd368'
+            '9b92ed0316bf2486121d8bac88bd1878f16b43bd335f18009b1f941f1eca93a1'
+            '0353220d6606077ba42363db65f50410759f9815352f77adc799e2adfa76e73f'
+            '7a405441dfc476666c744f5fcd1bc8a75abf8b5b1d85db7b88b370982365080e'
+            '51c98a0feafd5878eb66872476606fecf3636ca1609f57417de1a03bc6afda1e'
+            'd64c68f0c3778c4f7c3ddd4883fd1fb24ba8d3df40601b77b18f66196354d831'
+            'd64c68f0c3778c4f7c3ddd4883fd1fb24ba8d3df40601b77b18f66196354d831'
+            'd6ef63e1927114ff2598c3ea8dd923471a2a80be059179dbb16c85cea8ac465f'
+            'd001b100647b13c99916cbd11bec125eaa54a31ff175dfa05e863f67dda2de83'
+            'b7025c627bcc01ec83b491d8a28776cfa7e9087612a8f35e41d849e4e797255a'
+            '08faa724d9892fea6b61a186a44f879393dac5551a49300276a4b67c733d1760'
+            'd309d199f5a6a3096d1708bba48252e4cedd45f442df7b79fc284805fa087120'
+            '4859720734939acf2e7f81fb3f848afce7b8c1cfaa2d01968165344e320cb155')
 
 build() {
-  cd "${srcdir}"
+  cd ${srcdir}
   
   for i in *; do
     if [ -d "${i}" ]; then
@@ -59,7 +59,7 @@ build() {
 }
 
 package() {
-  cd "${srcdir}"
+  cd ${srcdir}
   
   for i in *; do
     if [ -d "${i}" ]; then
@@ -70,6 +70,5 @@ package() {
     fi
   done
   
-  # Replacing stub license files
-  install -D -m644 "${srcdir}"/LICENSE.* "${pkgdir}/usr/share/licenses/${pkgname}/"  
+  install -D -m644 LICENSE.* ${pkgdir}/usr/share/licenses/${pkgname}/  
 }

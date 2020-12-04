@@ -1,41 +1,37 @@
 
 pkgname=gst-libav
-pkgver=1.10.0
+pkgver=1.18.1
 pkgrel=1
 pkgdesc="Gstreamer libav Plugin"
 arch=('x86_64')
 license=('GPL')
-url="http://gstreamer.freedesktop.org/"
-depends=('gst-plugins-base' 'bzip2')
-makedepends=('yasm' 'python3')
+url="https://gstreamer.freedesktop.org/"
+depends=('gst-plugins-base' 'bzip2' 'ffmpeg')
+makedepends=('yasm' 'python3' 'meson' 'ninja')
 options=('!emptydirs' '!libtool')
-source=("http://gstreamer.freedesktop.org/src/gst-libav/${pkgname}-${pkgver}.tar.xz")
-md5sums=('5a91cea1affe136298db4f6185f78f72')
+source=("https://gstreamer.freedesktop.org/src/gst-libav/${pkgname}-${pkgver}.tar.xz")
+sha256sums=('39a717bc2613efbbba19df3cf5cacff0987471fc8281ba2c5dcdeaded79c2ed8')
 
 build() {
-  cd ${pkgname}-${pkgver}
-
-  ./configure --prefix=/usr \
-      --sysconfdir=/etc \
-      --localstatedir=/var \
-      --disable-static \
-      --with-libav-extra-configure="--enable-runtime-cpudetect" \
-      --with-package-name="GStreamer libav Plugin (KaOS)" \
-      --with-package-origin="http://kaosx.us/"
-
-  sed -i -e 's/ -shared / -Wl,-O1,--as-needed\0/g' libtool
-
-  make
+  mkdir -p build
+  cd build
+  
+  meson ../${pkgname}-${pkgver} \
+    --prefix=/usr \
+    --buildtype=release \
+    -Dpackage-name="GStreamer Good (KaOS)" \
+    -Dpackage-origin="https://kaosx.us/" 
+  ninja
 }
 
 check() {
-  cd ${pkgname}-${pkgver}
+  cd build
 
-  make check
+  ninja test
 }
 
 package() {
-  cd ${pkgname}-${pkgver}
-
-  make DESTDIR="${pkgdir}" install
+  cd build
+  
+  DESTDIR=${pkgdir} ninja install
 }

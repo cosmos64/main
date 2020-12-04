@@ -1,19 +1,21 @@
 
 pkgname=python3-setuptools
-pkgver=28.7.1
+pkgver=50.3.2
 pkgrel=1
 pkgdesc="Easily download, build, install, upgrade, and uninstall Python3 packages"
 arch=('x86_64')
 license=('PSF')
-url="http://pypi.python.org/pypi/setuptools"
-depends=('python3-packaging')
-makedepends=('asciidoc') # 'python3-setuptools')
-source=("https://github.com/pypa/setuptools/archive/v${pkgver}.tar.gz")
-md5sums=('61e59d268dfd84446d6f5e652aa30e4c')
+url="https://pypi.org/project/setuptools/"
+depends=('python3-appdirs' 'python3-packaging')
+makedepends=('asciidoc' 'python3-pip')
+source=("https://files.pythonhosted.org/packages/source/s/setuptools/setuptools-${pkgver}.zip")
+#source=("https://github.com/pypa/setuptools/archive/v${pkgver}.tar.gz")
+sha256sums=('ed0519d27a243843b05d82a5e9d01b0b083d9934eaa3d02779a23da18077bd3c')
 
 build() {
    cd setuptools-${pkgver}
    sed -i -e "s|^#\!.*/usr/bin/env python|#!/usr/bin/env python3|" setuptools/command/easy_install.py
+   sed -i '/pip.main(args)/d' bootstrap.py
    
    python3 bootstrap.py
    python3 setup.py build

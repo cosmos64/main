@@ -1,27 +1,27 @@
 
 pkgname=giflib
-pkgver=5.1.4
+pkgver=5.2.1
 pkgrel=1
 pkgdesc="A library for reading and writing gif images"
-url="http://sourceforge.net/projects/giflib/"
+url="https://sourceforge.net/projects/giflib/"
 arch=('x86_64')
 license=('MIT')
 depends=('libx11' 'libsm')
 makedepends=('xmlto' 'docbook-xml' 'docbook-xsl')
 options=('!libtool')
-source=("http://downloads.sourceforge.net/sourceforge/giflib/${pkgname}-${pkgver}.tar.bz2")
-md5sums=('2c171ced93c0e83bb09e6ccad8e3ba2b')
+source=("https://downloads.sourceforge.net/sourceforge/giflib/${pkgname}-${pkgver}.tar.gz")
+md5sums=('6f03aee4ebe54ac2cc1ab3e4b0a049e5')
 
 build() {
-  cd ${srcdir}/${pkgname}-${pkgver}
+  cd ${pkgname}-${pkgver}
   
-  ./configure --prefix=/usr
+  #./configure --prefix=/usr
   make
 }
 
 package() {
-  cd ${srcdir}/${pkgname}-${pkgver}
-  make DESTDIR=${pkgdir} install
+  cd ${pkgname}-${pkgver}
+  make DESTDIR=${pkgdir} PREFIX=/usr LIBDIR=/usr/lib MANDIR=/usr/share/man/man1 install
   
-  install -Dm644 COPYING "${pkgdir}/usr/share/licenses/${pkgname}/COPYING"
+  install -Dm644 COPYING ${pkgdir}/usr/share/licenses/${pkgname}/COPYING
 }

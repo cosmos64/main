@@ -1,15 +1,16 @@
 
 pkgname=lensfun
-pkgver=0.3.2
-pkgrel=3
+pkgver=0.3.95
+pkgrel=2
 pkgdesc="Database of photographic lenses and a library that allows advanced access to the database"
 arch=('x86_64')
-url="http://sourceforge.net/projects/lensfun/"
+url="https://lensfun.github.io/"
 license=('LGPL3')
 depends=('glibc' 'glib2')
 makedepends=('python3' 'libpng' 'cmake')
-source=("http://sourceforge.net/projects/lensfun/files/${pkgver}/${pkgname}-${pkgver}.tar.gz") 
-md5sums=('247e59a0812ec451f6cd0d20b3379cb5')
+#source=("https://github.com/lensfun/lensfun/archive/v${pkgver}.tar.gz")
+source=("https://sourceforge.net/projects/lensfun/files/${pkgver}/${pkgname}-${pkgver}.tar.gz") 
+md5sums=('21107eaf72303706256481fef2dc8013')
 
 build() {
     cd ${pkgname}-${pkgver}

@@ -1,18 +1,19 @@
 
 pkgname=udisks2
-pkgver=2.1.7
-pkgrel=2
-pkgdesc="Disk Management Service"
+pkgver=2.9.1
+pkgrel=1
+pkgdesc="Provides a daemon, tools and libraries to access and manipulate disks, storage devices and technologies."
 arch=('x86_64')
-url="http://www.freedesktop.org/wiki/Software/udisks"
+url="https://www.freedesktop.org/wiki/Software/udisks"
 license=('GPL')
 depends=('systemd' 'libgudev' 'sg3_utils' 'glib2' 'dbus-glib' 'polkit' 'parted' 'device-mapper'
-         'libatasmart' 'lsof' 'lvm2' 'util-linux')
-makedepends=('intltool' 'docbook-xsl' 'python3')
+         'libatasmart' 'lsof' 'lvm2' 'util-linux' 'libblockdev' 'gptfdisk')
+makedepends=('docbook-xsl' 'python3')
 options=('!libtool')
-source=("http://udisks.freedesktop.org/releases/udisks-$pkgver.tar.bz2"
+backup=(etc/udisks2/udisks2.conf)
+source=("https://github.com/storaged-project/udisks/releases/download/udisks-${pkgver}/udisks-${pkgver}.tar.bz2"
         '10-enable-mount.rules')
-md5sums=('8bccd36573b75286538bd5bd2c424f45'
+md5sums=('aad9c50f4cafccee01a621a6a6665784'
          '5f6c7dcbc2e98b7814a91fbe7630ecfc')
 
 build() {
@@ -23,7 +24,12 @@ build() {
         --localstatedir=/var \
         --libexecdir=/usr/lib \
         --with-systemdsystemunitdir=/usr/lib/systemd/system \
-        --disable-static
+        --disable-static \
+        --enable-lvm2 \
+        --enable-lvmcache \
+        --enable-btrfs \
+        --enable-zram \
+        --enable-bcache
   make
 }
 
@@ -33,7 +39,7 @@ package() {
      bash_completiondir=/usr/share/bash-completion/completions
   
   # allow ntfs mounts
-  sed -i -e 's|<allow_active>auth_admin_keep</allow_active>|<allow_active>yes</allow_active>|' ${pkgdir}/usr/share/polkit-1/actions/org.freedesktop.udisks2.policy
+  sed -i -e 's|<allow_active>auth_admin_keep</allow_active>|<allow_active>yes</allow_active>|' ${pkgdir}/usr/share/polkit-1/actions/org.freedesktop.UDisks2.policy
   # set auto-mounting authorizations 
   install -dm 700 -o polkitd $pkgdir/etc/polkit-1/rules.d/
   install -Dm 644 $srcdir/10-enable-mount.rules $pkgdir/etc/polkit-1/rules.d/10-enable-mount.rules

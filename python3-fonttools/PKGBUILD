@@ -1,0 +1,28 @@
+
+pkgname=python3-fonttools
+pkgver=4.17.1
+pkgrel=1
+pkgdesc="Converts OpenType and TrueType fonts to and from XML"
+url="https://github.com/fonttools/fonttools"
+license=('BSD')
+arch=('x86_64')
+depends=('python3-numpy')
+makedepends=('python3-setuptools')
+source=("https://github.com/fonttools/fonttools/archive/${pkgver}.tar.gz")
+md5sums=('aecb4dd055c95b765880fd1cf5cbf29e')
+
+build() {
+  cd fonttools-${pkgver}
+
+  python3 setup.py build
+}
+
+package() {
+  cd fonttools-${pkgver}
+
+  python3 setup.py install --root=${pkgdir} --optimize=1
+
+  install -D -m755 LICENSE ${pkgdir}/usr/share/licenses/${pkgname}/LICENSE
+  chmod oga+r ${pkgdir}/usr/share/man/man1/ttx.1
+}
+

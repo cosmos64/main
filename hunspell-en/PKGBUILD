@@ -1,18 +1,18 @@
 
 pkgname=hunspell-en
-pkgver=2016.06.26
-pkgrel=2
+pkgver=2019.10.06
+pkgrel=1
 pkgdesc="English hunspell dictionaries"
 arch=('x86_64')
 url="http://wordlist.aspell.net/"
 license=('LGPL' 'custom:scowl')
 optdepends=('hunspell:	the spell checking libraries and apps')
-source=("http://downloads.sourceforge.net/wordlist/hunspell-en_US-${pkgver}.zip"
-        "http://downloads.sourceforge.net/wordlist/hunspell-en_CA-${pkgver}.zip"
-        "http://downloads.sourceforge.net/wordlist/hunspell-en_GB-large-${pkgver}.zip")
-md5sums=('8f84affaccbb3f55eeee3f2fed05daf7'
-         '7a42059b03c3a5081ce035ab03d42998'
-         '24105c1b6c8ba18ddc9dbb483ae45bc4')
+source=("https://downloads.sourceforge.net/wordlist/hunspell-en_US-${pkgver}.zip"
+        "https://downloads.sourceforge.net/wordlist/hunspell-en_CA-${pkgver}.zip"
+        "https://downloads.sourceforge.net/wordlist/hunspell-en_GB-large-${pkgver}.zip")
+md5sums=('aca10fe37ef2c103d137a9cc84335250'
+         '06042dee9d1aac53dd72c54558b2a752'
+         '057d6a89e0952d076fff5a8bb6580f20')
 
 build() {
  /bin/true

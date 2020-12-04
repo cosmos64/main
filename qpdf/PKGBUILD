@@ -1,20 +1,20 @@
 
 # rebuild cups-filters on every update, but point update
 pkgname=qpdf
-pkgver=6.0.0
-pkgrel=2
+pkgver=10.0.4
+pkgrel=1
 pkgdesc="QPDF: A Content-Preserving PDF Transformation System"
 arch=('x86_64')
 url="http://qpdf.sourceforge.net/"
 license=('custom:Artistic-2.0')
-depends=('pcre' 'perl')
+depends=('openjpeg' 'zlib')
 makedepends=('make')
 options=('!libtool')
-source=("http://downloads.sourceforge.net/qpdf/${pkgname}-${pkgver}.tar.gz")
-md5sums=('e014bd3ecf1c4d1a520bbc14d84ac20e')
+source=("https://github.com/qpdf/qpdf/releases/download/release-${pkgname}-${pkgver}/${pkgname}-${pkgver}.tar.gz")
+sha256sums=('b191dc4af4ea4630cdc404a4ee95a0f21c12f56ecc4ae045f04425464d7c696e')
 
 build() {
-  cd "${srcdir}/${pkgname}-${pkgver}"
+  cd ${pkgname}-${pkgver}
 
   ./configure --prefix=/usr --disable-static
   make
@@ -22,9 +22,9 @@ build() {
 
 
 package() {
-  cd "${srcdir}/${pkgname}-${pkgver}"
+  cd ${pkgname}-${pkgver}
   
-  make DESTDIR="${pkgdir}/" install
+  make DESTDIR=${pkgdir}/ install
 
   mkdir -m755 -p ${pkgdir}/usr/share/licenses/${pkgname}
   install -m644 Artistic-2.0 ${pkgdir}/usr/share/licenses/${pkgname}/

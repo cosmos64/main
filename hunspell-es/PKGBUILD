@@ -1,6 +1,6 @@
 
 pkgname=hunspell-es
-pkgver=2.1.1
+pkgver=2.6
 pkgrel=1
 pkgdesc="Spanish hunspell dictionaries"
 arch=('x86_64')
@@ -11,7 +11,7 @@ noextract=(es_ANY.oxt es_AR.oxt es_BO.oxt es_CL.oxt es_CO.oxt
            es_CR.oxt es_CU.oxt es_DO.oxt es_EC.oxt es_ES.oxt 
            es_GT.oxt es_HN.oxt es_MX.oxt es_NI.oxt es_PA.oxt 
            es_PE.oxt es_PR.oxt es_PY.oxt es_SV.oxt es_UY.oxt es_VE.oxt)
-source=("https://github.com/sbosio/rla-es/releases/download/v${pkgver}/es_ANY.oxt"
+source=("https://github.com/sbosio/rla-es/releases/download/v${pkgver}/es.oxt"
         "https://github.com/sbosio/rla-es/releases/download/v${pkgver}/es_AR.oxt"
         "https://github.com/sbosio/rla-es/releases/download/v${pkgver}/es_BO.oxt"
         "https://github.com/sbosio/rla-es/releases/download/v${pkgver}/es_CL.oxt"
@@ -32,30 +32,32 @@ source=("https://github.com/sbosio/rla-es/releases/download/v${pkgver}/es_ANY.ox
         "https://github.com/sbosio/rla-es/releases/download/v${pkgver}/es_SV.oxt"
         "https://github.com/sbosio/rla-es/releases/download/v${pkgver}/es_UY.oxt"
         "https://github.com/sbosio/rla-es/releases/download/v${pkgver}/es_VE.oxt")
-md5sums=('05c257b89373d068eb33debccafaba1d'
-         '734c4926d8ada7ea7209636035739fe2'
-         '17812d2473dd4e18e14cbe5a92af3e17'
-         'ad00085f2caffdc762515e6944afa850'
-         '4d4f710dbd147c0aea97331d75b1a35c'
-         '3427143afec8833ab4752220be5d70b1'
-         '8874b4ab59c193b0e81cec9d3b87eda0'
-         'e7ab39bdff1991273c8f8144ab83a7f5'
-         '8a9bc2ca06a66102d66f92c7d6389cdc'
-         'ee9b7f7eb7c8ff9adab90eda3e506923'
-         '5075980a9e5380cfbe41d8c1f1a4bc8e'
-         '0a4515bd8229f119a75f75a66d844bba'
-         'ec2c12efdce4a2366323dffdea0c10bf'
-         'c6008281b5ada374e5edfa29bd2beb36'
-         '570ce39f322d2796db7a0a2e9891a021'
-         'dfe4947d55e4bac1e931d95e24c4ec57'
-         '61e46c42e08741246f04dfd80badf316'
-         'cdc8bde78fb2c4e1bf2cdefcbca0ca92'
-         'd15bceb79dea5a014441b4e71b1976b8'
-         '865eea12715c68226b0b874d57f3b256'
-         '2f0684ec913a8496721410dc34e5d91d')
+md5sums=('59a6bd0ad94bea5b0fa53892529e5c16'
+         '00ff4bb8c08911410d89145d5bb4f43b'
+         'a5d7c3c7a17e31ce7161fdb74d6d2250'
+         '911c963ba9cf76a4179ff75be0790f8d'
+         '7765b8a2c0db9c6b2d110d1d60887caa'
+         '1831c15f8916e36f737df5cbdb094d8b'
+         'e7d993a2ae0233d524c4a1155b9d63f5'
+         'cc3561f2f4acdaf4fc8c1d4c197b313f'
+         'bf00d03d2081389dc62835b2c4fbb4b1'
+         '6d14a8bec7bc02145eb4ce2767115aa1'
+         '9806eb61d4c3c0e090042137471f499b'
+         '434891cb19bd717ea03eef58bf93097c'
+         '70b7752aea073c9458e80d8a0cbcc282'
+         'ffe0d11d32d261b4c59a51070eb702d4'
+         'cfbce489d8a5bc93d58697f4acb59523'
+         '5bbecbb1765458ad9f48fdb16213eb9a'
+         '907cbe79f1a70c9c4cfe61ddaa3cf6ff'
+         '4aa5082eb8f78e451a169bea3f8027f3'
+         '5614da62cf99a8ea0812c5c46c49d378'
+         'a3a1d783100fdd04dd4f9912f07eba1f'
+         'd60daf3b1990a4053c7926106d3fd992')
 
 package() {
 
+  export LANG=en_US.UTF-8
+  
   for file in *.oxt; do
     LANG=en_US.utf8 bsdtar -xf $file
   done

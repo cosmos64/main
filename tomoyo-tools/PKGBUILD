@@ -1,19 +1,19 @@
 
 pkgname=tomoyo-tools
-_basever=2.5.0
-_timestamp=20140601
-_file=53357
+_basever=2.6.0
+_timestamp=20200101
+_file=70710
 pkgver=${_basever}.${_timestamp}
-pkgrel=17
+pkgrel=5
 pkgdesc='TOMOYO Linux 2.5.x userspace tools for Linux kernel 3.2 and above'
 arch=('x86_64')
-url='http://tomoyo.sourceforge.jp'
+url='http://tomoyo.osdn.jp/'
 license=('GPL')
-depends=('ncurses' 'linux>=4.8')
+depends=('ncurses' 'linux>=5.8.16')
 makedepends=('help2man')
 install=tomoyo-tools.install
-source=("http://sourceforge.jp/frs/redir.php?f=/tomoyo/${_file}/${pkgname}-${_basever}-${_timestamp}.tar.gz")
-md5sums=('888869b793127f00d6439a3246598b83')
+source=("https://jaist.dl.osdn.jp/tomoyo/${_file}/${pkgname}-${_basever}-${_timestamp}.tar.gz")
+md5sums=('bbbb24d8d831742996fedacddfc09e8d')
 
 build() {
     cd ${pkgname}
@@ -24,5 +24,5 @@ build() {
 package() {
     cd ${pkgname}
     
-    make INSTALLDIR="${pkgdir}" install
+    make INSTALLDIR=${pkgdir} install
 }

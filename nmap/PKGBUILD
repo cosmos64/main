@@ -1,33 +1,37 @@
 
 pkgname=nmap
-pkgver=7.31
+pkgver=7.91
 pkgrel=1
 pkgdesc="Network exploration tool and security/port scanner"
 arch=('x86_64')
-url="http://nmap.org"
+url="https://nmap.org"
 license=('GPL2')
-depends=('pcre' 'openssl' 'libpcap>=1.0.0' 'lua')
-makedepends=('python2')
-source=("http://nmap.org/dist/${pkgname}-${pkgver}.tar.bz2")
-md5sums=('f2f6660142a777862342a58cc54258ea')
+depends=('pcre' 'openssl' 'libpcap') # 'lua')
+makedepends=('python3')
+source=("https://nmap.org/dist/${pkgname}-${pkgver}.tar.bz2")
+md5sums=('239cef725863ab454590a1bb8793b72b')
 
 build() {
   cd ${pkgname}-${pkgver}
 
-  ./configure --prefix=/usr --mandir=/usr/share/man --libexecdir=/usr/lib --without-gui
+  ./configure --prefix=/usr \
+    --mandir=/usr/share/man \
+    --libexecdir=/usr/lib \
+    --without-gui \
+    --with-liblua=included  # once moved to lua 5.3 /usr/include
   make
 }
 
 package() {
   cd ${pkgname}-${pkgver}
-  make DESTDIR="${pkgdir}" install
+  make DESTDIR=${pkgdir} install
 
   # remove zenmap uninstall script
-  rm ${pkgdir}/usr/bin/uninstall_zenmap
+  #rm ${pkgdir}/usr/bin/uninstall_zenmap
   # zenmap needs gtk
-  rm ${pkgdir}/usr/share/applications/zenmap-root.desktop
-  rm ${pkgdir}/usr/share/applications/zenmap.desktop
+  #rm ${pkgdir}/usr/share/applications/zenmap-root.desktop
+  #rm ${pkgdir}/usr/share/applications/zenmap.desktop
 
-  install -D -m644 COPYING ${pkgdir}/usr/share/licenses/${pkgname}/LICENSE
+  install -D -m644 LICENSE ${pkgdir}/usr/share/licenses/${pkgname}/LICENSE
 }
 

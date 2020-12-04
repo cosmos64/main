@@ -1,38 +1,41 @@
 
 pkgname=gdb
-pkgver=7.12
+pkgver=10.1
 pkgrel=1
 pkgdesc="The GNU Debugger"
 arch=('x86_64')
-url="http://www.gnu.org/software/gdb/"
+url="https://www.gnu.org/software/gdb/"
 license=('GPL3')
-depends=('ncurses' 'expat' 'python2' 'guile')
+depends=('ncurses' 'expat' 'python3' 'guile' 'source-highlight' 'boost-libs')
 makedepends=('texinfo')
 backup=('etc/gdb/gdbinit')
 options=('!libtool' '!buildflags')
-source=("http://ftp.gnu.org/gnu/gdb/${pkgname}-${pkgver}.tar.xz")
-md5sums=('a0a3a00f7499b0c5278ba8676745d180')
+source=("https://ftp.gnu.org/gnu/gdb/${pkgname}-${pkgver}.tar.xz")
+md5sums=('1822a7dd45e7813f4408407eec1a6af1')
 
 build() {
-  cd ${srcdir}/${pkgname}-${pkgver}
+  cd ${pkgname}-${pkgver}
   
-  ./configure --prefix=/usr \
+  mkdir -p build
+  cd build
+  
+  ../configure --prefix=/usr \
     --disable-nls \
     --with-system-readline \
-    --with-python=/usr/bin/python2 \
+    --with-python=/usr/bin/python3 \
     --with-system-gdbinit=/etc/gdb/gdbinit
   make
 }
 
 package() {
-  cd ${srcdir}/${pkgname}-${pkgver}
+  cd ${pkgname}-${pkgver}/build
   make DESTDIR=${pkgdir} install
 
   install -dm755 $pkgdir/etc/gdb
   touch $pkgdir/etc/gdb/gdbinit
 
   # files in binutils
-  rm ${pkgdir}/usr/include/{ansidecl,bfd,bfdlink,dis-asm,symcat,plugin-api}.h
-  rm ${pkgdir}/usr/lib/{libbfd,libopcodes}.a
+  rm ${pkgdir}/usr/include/{ansidecl,bfd,bfdlink,bfd_stdint,ctf-api,ctf,diagnostics,dis-asm,symcat,plugin-api}.h
+  rm ${pkgdir}/usr/lib/{libbfd,libctf-nobfd,libctf,libopcodes}.a
   rm ${pkgdir}/usr/share/info/bfd.info
 }

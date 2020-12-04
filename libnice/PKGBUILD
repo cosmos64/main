@@ -1,25 +1,32 @@
 
 pkgname=libnice
-pkgver=0.1.13
+pkgver=0.1.18
 pkgrel=1
 pkgdesc="An implementation of the IETF's draft ICE (for p2p UDP data streams)"
 arch=('x86_64')
-url="http://nice.freedesktop.org"
+url="https://libnice.freedesktop.org/"
 license=('LGPL')
-depends=('gstreamer')
+depends=('gstreamer' 'libtasn1' 'libidn2' 'gnutls' 'nettle')
+makedepends=('python3' 'meson' 'ninja')
 options=('!libtool')
-source=("http://nice.freedesktop.org/releases/${pkgname}-${pkgver}.tar.gz")
-md5sums=('3226faeaf48a9150ada00da2e2865959')
+source=("https://libnice.freedesktop.org/releases/${pkgname}-${pkgver}.tar.gz")
+md5sums=('408482fa4bab7c6b884b0fb9ad57a038')
 
 build() {
-  cd "${srcdir}/${pkgname}-${pkgver}"
+  mkdir -p build
+  cd build
   
-  ./configure --prefix=/usr --disable-static
-  make
+  meson ../${pkgname}-${pkgver} \
+    --prefix=/usr \
+    --buildtype=release \
+    -Dtests=disabled \
+    -Dgtk_doc=disabled
+  ninja
 }
 
 package() {
-  cd "${srcdir}/${pkgname}-${pkgver}"
+  cd build
   
-  make DESTDIR=${pkgdir} install
+  DESTDIR=${pkgdir} ninja install
 }
+

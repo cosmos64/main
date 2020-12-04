@@ -1,23 +1,23 @@
 
 pkgname=pycups
-pkgver=1.9.73
+pkgver=2.0.1
 pkgrel=2
 pkgdesc="Python CUPS Bindings"
 url="http://cyberelk.net/tim/software/pycups/"
 arch=('x86_64')
 license=('GPL')
 depends=('libcups' 'python3')
-source=("http://cyberelk.net/tim/data/pycups/${pkgname}-${pkgver}.tar.bz2")
-md5sums=('ee0e7204d7a2ae942e2f4c4508afdbfb')
+source=("https://files.pythonhosted.org/packages/source/p/pycups/${pkgname}-${pkgver}.tar.gz")
+sha256sums=('57434ce5f62548eb12949ca8217f066f4eeb21a5d6ab8b13471dce350e380c90')
 
 build() {
-  cd "${srcdir}/${pkgname}-${pkgver}"
+  cd ${pkgname}-${pkgver}
   
   python3 setup.py build
 }
 
 package() {
-  cd "${srcdir}/${pkgname}-${pkgver}"
+  cd ${pkgname}-${pkgver}
   
-  python3 setup.py install --root="${pkgdir}" --optimize=1
+  python3 setup.py install --root=${pkgdir} --optimize=1
 }

@@ -1,36 +1,42 @@
 
 pkgname=fontforge
-pkgver=20161012
-_pkgver=20161012
+pkgver=20201107
+_pkgver=20201107
 pkgrel=1
 pkgdesc="An outline and bitmap font editor"
 arch=('x86_64')
-url="http://fontforge.github.io/"
+url="https://fontforge.github.io/"
 license=('BSD')
-depends=('libxkbui' 'libxi' 'libxml2' 'pango' 'giflib' 'libpng' 'libtiff' 'libjpeg-turbo' 'python3'
+depends=('libxi' 'libxml2' 'pango' 'giflib' 'libpng' 'libtiff' 'libjpeg-turbo' 'python3'
          'libtool' 'desktop-file-utils' 'hicolor-icon-theme')
+makedepends=('cmake')
 options=('!libtool' '!makeflags')
-source=("https://github.com/fontforge/fontforge/archive/${_pkgver}.tar.gz"
-        'http://fontforge.org/cidmaps.tgz')
-md5sums=('d7e3cfc8097808e5bfbee44749f30808'
+source=("https://github.com/fontforge/fontforge/releases/download/${_pkgver}/fontforge-${_pkgver}.tar.xz"
+        'https://fontforge.github.io/cidmaps.tgz')
+md5sums=('efc0b3c79ba576133de70d67ccadcf24'
          '063691163e592515b31514515bb3ce8c')
-
 build() {
-  cd ${pkgname}-${_pkgver}
-  #sed '/fontforge_package_name/s/^#//' -i configure.ac
+  mkdir -p build
+  cd build
   
-  ./bootstrap
-  ./configure --prefix=/usr \
-              --mandir=/usr/share/man
-  make 
+  cmake ../${pkgname}-${pkgver} \
+    -DCMAKE_BUILD_TYPE=Release \
+    -DCMAKE_INSTALL_PREFIX=/usr \
+    -DENABLE_DOCS=OFF \
+    -DENABLE_X11=ON \
+    -DENABLE_LIBUNINAMESLIST=OFF \
+    -DENABLE_LIBSPIRO=OFF \
+    -DENABLE_FONTFORGE_EXTRAS=ON \
+    -DENABLE_MAINTAINER_TOOLS=ON
+  make
 }
 
 package() {
-  cd ${pkgname}-${_pkgver} 
-  make DESTDIR=${pkgdir} install 
+  cd build
+  make DESTDIR=${pkgdir} install
   
   install -d ${pkgdir}/usr/share/fontforge
   install -m644 ../Adobe-* ${pkgdir}/usr/share/fontforge
   
-  install -D -m644 LICENSE ${pkgdir}/usr/share/licenses/${pkgname}/LICENSE 
+  install -D -m644 ../${pkgname}-${pkgver}/LICENSE ${pkgdir}/usr/share/licenses/${pkgname}/LICENSE 
 }

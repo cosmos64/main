@@ -1,27 +1,29 @@
 
 pkgname=espeak
-pkgver=1.48.04
+pkgver=1.50
 pkgrel=1
 pkgdesc="Text to Speech engine for good quality English, with support for other languages"
 arch=('x86_64')
-url="http://espeak.sourceforge.net/"
+url="https://groups.io/g/espeak-ng/"
 license=('GPL')
-depends=('gcc-libs' 'portaudio-svn' 'pulseaudio')
+depends=('gcc-libs' 'portaudio' 'pulseaudio' 'pcaudiolib')
 options=('!emptydirs')
-source=("http://downloads.sourceforge.net/sourceforge/${pkgname}/${pkgname}-${pkgver}-source.zip")
-md5sums=('cadd7482eaafe9239546bdc09fa244c3')
+source=("https://github.com/espeak-ng/espeak-ng/archive/${pkgver}/${pkgname}-ng-${pkgver}.tar.gz")
+md5sums=('7fccc4669d939c330c49b53d94c4c3af')
 
 
 build() {
-  cd $startdir/src/$pkgname-$pkgver-source/src
-  cp portaudio19.h portaudio.h
+  cd ${pkgname}-ng-${pkgver}
   
-  make CXXFLAGS="$CXXFLAGS" AUDIO=pulseaudio
+  ./autogen.sh
+  ./configure --prefix=/usr
+  
+  make -j1 
 }
 
 package() {
-  cd "$srcdir/$pkgname-$pkgver-source/src"
-  make DESTDIR=$pkgdir install
+  cd ${pkgname}-ng-${pkgver}
+  make DESTDIR=${pkgdir} install
   
-  chmod 644 "$pkgdir/usr/lib/libespeak.a"
+  chmod 644 ${pkgdir}/usr/lib/libespeak-ng.a
 }

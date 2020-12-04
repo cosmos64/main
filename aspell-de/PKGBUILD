@@ -1,14 +1,14 @@
 
 pkgname=aspell-de
-pkgver=20160407
-pkgrel=1
+pkgver=20161207
+pkgrel=2
 pkgdesc="German dictionary for aspell"
 arch=('x86_64')
-url="http://aspell.net/"
+url="https://j3e.de/ispell/igerman98/"
 license=('GPL2')
 depends=('aspell')
-source=("http://j3e.de/ispell/igerman98/dict/igerman98-${pkgver}.tar.bz2")
-md5sums=('5e5ce15bbfd56a6f89e7789e63fffad0')
+source=("https://j3e.de/ispell/igerman98/dict/igerman98-${pkgver}.tar.bz2")
+md5sums=('eb170f5d8992653b47ac4a15d127b58a')
 
 build() {
   cd igerman98-${pkgver}

@@ -1,32 +1,31 @@
 
 pkgname=lilv
-pkgver=0.24.0
+pkgver=0.24.10
 pkgrel=1
 pkgdesc="A library to make the use of LV2 plugins as simple as possible for applications"
 arch=('x86_64')
-url="http://drobilla.net/software/lilv/"
+url="https://drobilla.net/software/lilv/"
 license=('custom:ISC')
-depends=('python2-numpy' 'sratom' 'jack')
+depends=('sratom' 'jack' 'python3')
 makedepends=('swig')
-source=("http://download.drobilla.net/${pkgname}-${pkgver}.tar.bz2")
-md5sums=('1d70964653027ba224c9f76abc0ee420')
+source=("https://download.drobilla.net/${pkgname}-${pkgver}.tar.bz2")
+md5sums=('c95e911988134245d33f0e7b35fce175')
 
 build() {
   cd ${pkgname}-${pkgver}
   sed -i "/ldconfig/d" wscript
 
-  python2 waf configure --prefix=/usr \
+  python3 waf configure --prefix=/usr \
                         --configdir=/etc \
-                        --dyn-manifest \
-                        --bindings
+                        --dyn-manifest
 
-  python2 waf build $MAKEFLAGS
+  python3 waf build $MAKEFLAGS
 }
 
 package() {
   cd ${pkgname}-${pkgver}
 
-  python2 waf install --destdir=${pkgdir}
+  python3 waf install --destdir=${pkgdir}
 
   install -Dm644 COPYING  ${pkgdir}/usr/share/licenses/${pkgname}/LICENSE
 }

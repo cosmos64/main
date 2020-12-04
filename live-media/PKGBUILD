@@ -1,22 +1,28 @@
 
+# rebuild vlc on any update, move to shared libs might change ABI
 pkgname=live-media
-pkgver=2016.10.21
+pkgver=2020.12.04
 pkgrel=1
 pkgdesc="A set of C++ libraries for multimedia streaming"
 arch=('x86_64')
 license=('LGPL')
 url="http://live555.com/liveMedia"
 depends=('gcc-libs')
-source=("http://live555.com/liveMedia/public/live.${pkgver}.tar.gz")
-md5sums=('3b1f04f17ac5206d9d1930fcc998a94e')
+source=("http://live555.com/liveMedia/public/live.${pkgver}.tar.gz"
+        'config.kaos')
+md5sums=('a72408926510d31774664123fbab3087'
+         '6ff1eab03314198badb96032a5299e2b')
 
+prepare() {
+  cd live
+  
+  cp ${srcdir}/config.kaos config.kaos
+}
+         
 build() {
   cd live
-
-  sed \
-      -e 's/$(INCLUDES) -I. -O2 -DSOCKLEN_T/$(INCLUDES) -I. -O2 -I. -fPIC -DRTSPCLIENT_SYNCHRONOUS_INTERFACE=1 -DSOCKLEN_T/g' \
-      -i config.linux
-  ./genMakefiles linux
+      
+  ./genMakefiles kaos
   make
 }
 
@@ -25,7 +31,7 @@ package() {
 
   for dir in BasicUsageEnvironment groupsock liveMedia UsageEnvironment; do
     install -dm755 ${pkgdir}/usr/{bin,lib,include/${dir}}
-    install -m644 ${dir}/*.a "${pkgdir}/usr/lib"
+    install -m644 ${dir}/*.so "${pkgdir}/usr/lib"
     install -m644 ${dir}/include/*.h* "${pkgdir}/usr/include/${dir}"
   done
 

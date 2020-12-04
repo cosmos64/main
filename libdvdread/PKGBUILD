@@ -1,8 +1,8 @@
 
 pkgname=libdvdread
-pkgver=5.0.3
-pkgrel=2
-pkgdesc="Provides a simple foundation for reading DVD video disks"
+pkgver=6.1.1
+pkgrel=1
+pkgdesc="Library that allows easy use of sophisticated DVD navigation features such as DVD menus and multiangle playback"
 arch=('x86_64')
 url="https://code.videolan.org/videolan/libdvdread"
 license=('GPL')
@@ -10,8 +10,8 @@ depends=('glibc')
 makedepends=('libdvdcss')
 optdepends=('libdvdcss: for decoding encrypted DVDs')
 options=('!libtool')
-source=("ftp://ftp.videolan.org/pub/videolan/libdvdread/${pkgver}/${pkgname}-${pkgver}.tar.bz2")
-md5sums=('b7b7d2a782087ed2a913263087083715')
+source=("https://download.videolan.org/pub/videolan/libdvdread/${pkgver}/${pkgname}-${pkgver}.tar.bz2")
+sha256sums=('3e357309a17c5be3731385b9eabda6b7e3fa010f46022a06f104553bf8e21796')
 
 build() {
   cd ${pkgname}-${pkgver}

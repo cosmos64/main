@@ -1,7 +1,7 @@
 
 pkgname=texlive-core
-pkgver=2016.41843
-_revnr=${pkgver#2016.}
+pkgver=2020.55416
+_revnr=${pkgver#2020.}
 pkgrel=1
 pkgdesc="TeX Live core distribution"
 license=('GPL')
@@ -10,7 +10,6 @@ depends=('texlive-bin' 'perl')
 optdepends=(
   'ruby:        for old ConTeXT MkII and epspdf'
   'tk:          for texdoctk'
-  'python2:     for dviasm'
   'python3:     for pythontex'
   'ghostscript: for epstopdf, epspdf and other ConTeXt tools' 
   'psutils:     to manipulate the output of dvips'
@@ -19,16 +18,39 @@ optdepends=(
 groups=('texlive-most')
 url='http://tug.org/texlive/'
 # full credit for this PKGBUILD goes to Rémy Oudompheng <remy@archlinux.org>
-source=("https://sources.archlinux.org/other/texlive/$pkgname-$pkgver-src.zip"
-        "$pkgname.maps"
+source=("https://sources.archlinux.org/other/texlive/${pkgname}-${pkgver}-src.zip"
+        "${pkgname}.maps"
+        'mktexlsr.hook'
+        'mktexlsr.script'
+        'texlive-updmap.hook'
+        'texlive-updmap.script'
+        'texlive-fmtutil.hook'
+        'texlive-fmtutil.script'
         'texmf.cnf'
         'texmfcnf.lua'
         '09-texlive-fonts.conf')
 options=('!strip')
-install=texlive.install
-md5sums=('84c8d40322b98dc10994f8e378d62640'
-         '54a34f8ddbeccec2427e4d5763349f9b'
-         'c59f1074a749056b53d36a5892a47e1a'
+#install=texlive.install
+backup=(etc/texmf/web2c/texmf.cnf \
+        etc/texmf/chktex/chktexrc \
+        etc/texmf/dvipdfmx/dvipdfmx.cfg \
+        tc/texmf/dvips/config/config.ps \
+        etc/texmf/tex/generic/config/language.dat \
+        etc/texmf/tex/generic/config/language.def \
+        etc/texmf/tex/generic/tex-ini-files/pdftexconfig.tex \
+        etc/texmf/ttf2pk/ttf2pk.cfg \
+        etc/texmf/web2c/fmtutil.cnf \
+        etc/texmf/web2c/mktex.cnf \
+        etc/texmf/xdvi/XDvi)
+md5sums=('785a6ad1ae38aaf4246d878d98472664'
+         'ae4f25a5e69e3debd0e662bd2231ff95'
+         '48b50bff6e9774563161545daca53e66'
+         '2bbbef810687f4b2804a4b8cb91ce02f'
+         '742702c6def4bf039d325d754d313211'
+         'f23e6cfe29615e81d6aa090e6ac06652'
+         '0e0157a532170d43f2657b6b36519e1b'
+         '3f05fa08f84b94fcb3a76be271116a95'
+         '6462eccdfc15104b5030c3e913cab930'
          '16ad4dc53deb00029baef1b01ba1d984'
          '393a4bf67adc7ca5df2b386759d1a637')
 
@@ -50,13 +72,11 @@ package() {
    install -m644 CONTENTS $pkgdir/var/lib/texmf/arch/installedpkgs/${pkgname}_${_revnr}.pkgs
    install -m644 $pkgname.maps $pkgdir/var/lib/texmf/arch/installedpkgs/
    install -m755 -d $pkgdir/usr/share
-
    wanteddirs=$(for d in *; do test -d $d && [[ $d != texmf* ]] && echo $d; done) || true
    for dir in $wanteddirs; do
      find $dir -type d -exec install -d -m755 $pkgdir/usr/share/texmf-dist/'{}' \;
      find $dir -type f -exec install -m644 '{}' $pkgdir/usr/share/texmf-dist/'{}' \;
    done
-
    find texmf-dist -type d -exec install -d -m755 $pkgdir/usr/share/'{}' \;
    find texmf-dist -type f -exec install -m644 '{}' $pkgdir/usr/share/'{}' \;
    find texmf-dist -type f -executable -exec chmod 755 $pkgdir/usr/share/'{}' \;
@@ -77,9 +97,6 @@ package() {
 
    # Remove manpages (already in texlive-bin).
    rm -rf "$pkgdir"/usr/share/texmf-dist/doc/man
-   
-   # Remove aleph from fmtutil.cnf
-   sed -i -e '/aleph/d' "$pkgdir"/usr/share/texmf-dist/web2c/fmtutil.cnf
 
    # copy config files to $TEXMFCONFIG tree
    cp -a "$pkgdir"/usr/share/texmf-dist/chktex/chktexrc \
@@ -88,8 +105,8 @@ package() {
    	  "$pkgdir"/etc/texmf/web2c/
    cp -a "$pkgdir"/usr/share/texmf-dist/web2c/updmap-hdr.cfg \
    	  "$pkgdir"/etc/texmf/web2c/
-   cp -a "$pkgdir"/usr/share/texmf-dist/web2c/fmtutil.cnf \
-   	  "$pkgdir"/etc/texmf/web2c/
+   cp -a "$pkgdir"/usr/share/texmf-dist/web2c/fmtutil-hdr.cnf \
+   	  "$pkgdir"/etc/texmf/web2c/fmtutil.cnf
    cp -a "$pkgdir"/usr/share/texmf-dist/dvips/config/config.ps \
    	  "$pkgdir"/etc/texmf/dvips/config/
    cp -a "$pkgdir"/usr/share/texmf-dist/dvipdfmx/dvipdfmx.cfg \
@@ -110,28 +127,27 @@ package() {
    # replace upstream texmf.cnf
    rm -f "$pkgdir"/usr/share/texmf-dist/web2c/texmf.cnf
    install -m644 "$srcdir"/texmf.cnf "$pkgdir"/etc/texmf/web2c/texmf.cnf
-   # since the location of texmf.cnf is hard-wired to be under /usr/share/texmf/web2c
-   # make a symlink from /etc/texmf/web2c/texmf.cnf to the latter
+   # make a symlink from /etc/texmf/web2c/texmf.cnf
    ln -sf /etc/texmf/web2c/texmf.cnf "$pkgdir"/usr/share/texmf-dist/web2c/texmf.cnf
    # replace upstream texmfcnf.lua
    install -m644 "$srcdir"/texmfcnf.lua "$pkgdir"/usr/share/texmf-dist/web2c/texmfcnf.lua
 
-   # create symlinks for formats 
-   echo "--> Create symlinks for TeX formats ..."
-   mkdir -p "${pkgdir}/usr/bin"
-   bash "${pkgdir}"/usr/share/texmf-dist/scripts/texlive/texlinks.sh -f "$pkgdir"/usr/share/texmf-dist/web2c/fmtutil.cnf "$pkgdir"/usr/bin/
-
    # install Perl libraries
    mv "$pkgdir"/usr/share/texmf-dist/tlpkg "$pkgdir"/usr/share
    rm -rf "$pkgdir"/usr/share/tlpkg/tlpobj
-   
-   # copy config file to texmf-config
-   #mkdir -p $pkgdir/etc/texmf/tex/context/config
-   #cp -a $pkgdir/usr/share/texmf-dist/tex/context/config/cont-usr.tex \
-   #	  $pkgdir/etc/texmf/tex/context/config/cont-usr.tex
+
+   ## install pacman hooks
+   install -D -m644 ${srcdir}/mktexlsr.hook "$pkgdir/usr/share/libalpm/hooks/mktexlsr.hook"
+   install -D -m644 ${srcdir}/texlive-updmap.hook "$pkgdir/usr/share/libalpm/hooks/texlive-updmap.hook"
+   install -D -m644 ${srcdir}/texlive-fmtutil.hook "$pkgdir/usr/share/libalpm/hooks/texlive-fmtutil.hook"
+   install -D -m755 ${srcdir}/mktexlsr.script "$pkgdir/usr/share/libalpm/scripts/mktexlsr"
+   install -D -m755 ${srcdir}/texlive-updmap.script "$pkgdir/usr/share/libalpm/scripts/texlive-updmap"
+   install -D -m755 ${srcdir}/texlive-fmtutil.script "$pkgdir/usr/share/libalpm/scripts/texlive-fmtutil"
    
    # remove upstream updmap.cfg: it contains too many maps.
    rm "${pkgdir}/usr/share/texmf-dist/web2c/updmap.cfg"
+   # remove upstream fmtutil.cnf: it will be autogenerated
+   rm "${pkgdir}/usr/share/texmf-dist/web2c/fmtutil.cnf"
  
    # more cleanup
    rm -rf $pkgdir/usr/share/texmf-dist/scripts/context/stubs/mswin/
@@ -144,13 +160,17 @@ accfonts/vpl2ovp
 accfonts/vpl2vpl
 adhocfilelist/adhocfilelist.sh
 arara/arara.sh
+attachfile2/pdfatfi.pl
 bundledoc/arlatex
 bundledoc/bundledoc
 checkcites/checkcites.lua
 checklistings/checklistings.sh
+chklref/chklref.pl
 chktex/chkweb.sh
 chktex/deweb.pl
 cjk-gs-integrate/cjk-gs-integrate.pl
+clojure-pamphlet/pamphletangler
+cluttex/cluttex.lua
 context/perl/mptopdf.pl
 context/stubs/unix/context
 context/stubs/unix/contextjit
@@ -159,12 +179,15 @@ context/stubs/unix/mtxrun
 context/stubs/unix/mtxrunjit
 context/stubs/unix/texexec
 context/stubs/unix/texmfstart
+ctan-o-mat/ctan-o-mat.pl
+ctanbib/ctanbib
 ctanify/ctanify
 ctanupload/ctanupload.pl
 de-macro/de-macro
 dosepsbin/dosepsbin.pl
 dtxgen/dtxgen
 dviasm/dviasm.py
+dviinfox/dviinfox.pl
 epstopdf/epstopdf.pl
 findhyph/findhyph
 fontools/afm2afm
@@ -172,8 +195,12 @@ fontools/autoinst
 fontools/ot2kpx
 fragmaster/fragmaster.pl
 installfont/installfont-tl
+jfmutil/jfmutil.pl
+ketcindy/ketcindy.sh
 latex-git-log/latex-git-log
+latex-papersize/latex-papersize.py
 latex2man/latex2man
+latex2nemeth/latex2nemeth
 latexdiff/latexdiff-vc.pl
 latexdiff/latexdiff.pl
 latexdiff/latexrevise.pl
@@ -183,27 +210,17 @@ latexmk/latexmk.pl
 latexpand/latexpand
 ltxfileinfo/ltxfileinfo
 ltximg/ltximg.pl
-lua2dox/lua2dox_filter
 luaotfload/luaotfload-tool.lua
+lwarp/lwarpmk.lua
 make4ht/make4ht
 match_parens/match_parens
 mf2pt1/mf2pt1.pl
 mkjobtexmf/mkjobtexmf.pl
-oberdiek/pdfatfi.pl
 pdfbook2/pdfbook2
 pdfcrop/pdfcrop.pl
-pdfjam/pdf180
-pdfjam/pdf270
-pdfjam/pdf90
-pdfjam/pdfbook
-pdfjam/pdfflip
 pdfjam/pdfjam
-pdfjam/pdfjam-pocketmod
-pdfjam/pdfjam-slides3up
-pdfjam/pdfjam-slides6up
-pdfjam/pdfjoin
-pdfjam/pdfnup
-pdfjam/pdfpun
+pdflatexpicscale/pdflatexpicscale.pl
+pdftex-quiet/pdftex-quiet
 pdfxup/pdfxup
 pfarrei/a5toa4.tlu
 pfarrei/pfarrei.tlu
@@ -211,59 +228,82 @@ pkfix-helper/pkfix-helper
 pkfix/pkfix.pl
 ps2eps/ps2eps.pl
 purifyeps/purifyeps
-pythontex/pythontex.py
 pythontex/depythontex.py
+pythontex/pythontex.py
 simpdftex/simpdftex
 srcredact/srcredact.pl
 sty2dtx/sty2dtx.pl
-texcount/texcount.pl
 tex4ebook/tex4ebook
+tex4ht/ht.sh
+tex4ht/htcontext.sh
+tex4ht/htlatex.sh
+tex4ht/htmex.sh
+tex4ht/httex.sh
+tex4ht/httexi.sh
+tex4ht/htxelatex.sh
+tex4ht/htxetex.sh
+tex4ht/mk4ht.pl
+tex4ht/xhlatex.sh
+texcount/texcount.pl
 texdef/texdef.pl
 texdiff/texdiff
 texdirflatten/texdirflatten
 texdoc/texdoc.tlu
 texdoctk/texdoctk.pl
 texfot/texfot.pl
-texlive/allcm.sh
-texlive/allneeded.sh
-texlive/dvi2fax.sh
-texlive/dvired.sh
-texlive/e2pall.pl
+texlive-extra/allcm.sh
+texlive-extra/allneeded.sh
+texlive-extra/dvi2fax.sh
+texlive-extra/dvired.sh
+texlive-extra/e2pall.pl
+texlive-extra/fontinst.sh
+texlive-extra/kpsetool.sh
+texlive-extra/kpsewhere.sh
+texlive-extra/ps2frag.sh
+texlive-extra/pslatex.sh
+texlive-extra/texconfig-dialog.sh
+texlive-extra/texconfig-sys.sh
+texlive-extra/texconfig.sh
+texlive-extra/texlinks.sh
 texlive/fmtutil-sys.sh
+texlive/fmtutil-user.sh
 texlive/fmtutil.pl
-texlive/fontinst.sh
-texlive/kpsetool.sh
-texlive/kpsewhere.sh
-texlive/ps2frag.sh
-texlive/pslatex.sh
+texlive/mktexlsr
+texlive/mktexmf
+texlive/mktexpk
+texlive/mktextfm
 texlive/rungs.tlu
-texlive/texconfig-dialog.sh
-texlive/texconfig-sys.sh
-texlive/texconfig.sh
-texlive/texlinks.sh
 texlive/updmap-sys.sh
+texlive/updmap-user.sh
 texlive/updmap.pl
 texliveonfly/texliveonfly.py
 texloganalyser/texloganalyser
+texplate/texplate.sh
 thumbpdf/thumbpdf.pl
 typeoutfileinfo/typeoutfileinfo.sh
+xindex/xindex.lua
 xindy/texindy.pl
 xindy/xindy.pl
 "
-    install -m755 -d $pkgdir/usr/bin
+    install -m755 -d "$pkgdir/usr/bin"
     for _script in ${_linked_scripts}; do
         _scriptbase=$(basename $_script)
         _scriptbase=${_scriptbase%.*}
-        ln -s /usr/share/texmf-dist/scripts/${_script} ${pkgdir}/usr/bin/${_scriptbase}
+        ln -s /usr/share/texmf-dist/scripts/${_script} "${pkgdir}/usr/bin/${_scriptbase}"
     done
-    ln -s /usr/share/texmf-dist/scripts/listings-ext/listings-ext.sh ${pkgdir}/usr/bin/listings-ext.sh
+    ln -s /usr/share/texmf-dist/scripts/listings-ext/listings-ext.sh "${pkgdir}/usr/bin/listings-ext.sh"
 
     # additional symlinks
-    ln -s allcm ${pkgdir}/usr/bin/allec
-    ln -s fmtutil ${pkgdir}/usr/bin/mktexfmt
-    ln -s kpsetool ${pkgdir}/usr/bin/kpsexpand
-    ln -s kpsetool ${pkgdir}/usr/bin/kpsepath
-    ln -s epstopdf ${pkgdir}/usr/bin/repstopdf
-    ln -s pdfcrop ${pkgdir}/usr/bin/rpdfcrop
-    ln -s luaotfload-tool ${pkgdir}/usr/bin/mkluatexfontdb
+    ln -s allcm "${pkgdir}"/usr/bin/allec
+    ln -s cluttex "${pkgdir}"/usr/bin/cllualatex
+    ln -s cluttex "${pkgdir}"/usr/bin/clxelatex
+    ln -s epstopdf "${pkgdir}"/usr/bin/repstopdf
+    ln -s fmtutil "${pkgdir}"/usr/bin/mktexfmt
+    ln -s kpsetool "${pkgdir}"/usr/bin/kpsepath
+    ln -s kpsetool "${pkgdir}"/usr/bin/kpsexpand
+    ln -s luaotfload-tool "${pkgdir}"/usr/bin/mkluatexfontdb
+    ln -s mktexlsr "${pkgdir}"/usr/bin/texhash
+    ln -s pdfcrop "${pkgdir}"/usr/bin/rpdfcrop
+    ln -s texdef "${pkgdir}"/usr/bin/latexdef
 }
+

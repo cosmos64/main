@@ -1,22 +1,23 @@
 
 pkgbase=libofx
 pkgname=('libofx' 'libofx-doc')
-pkgver=0.9.10
-pkgrel=2
+pkgver=0.9.15
+pkgrel=1
 pkgdesc="API for the OFX banking standard"
 arch=('x86_64')
-url="http://libofx.sourceforge.net"
+url="https://github.com/libofx/libofx"
 license=('GPL')
-depends=('opensp' 'curl' 'libxml++')
+depends=('opensp' 'curl') # net ready for 2.6 > 'libxml++', ofxconnect not build)
 checkdepends=('gnupg')
-source=("http://downloads.sourceforge.net/libofx/${pkgbase}-${pkgver}.tar.gz")
-md5sums=('adfa83a08d76b047f89a82d5b484f79b' )
+source=("https://downloads.sourceforge.net/libofx/${pkgbase}-${pkgver}.tar.gz")
+#source=("https://github.com/libofx/libofx/archive/${pkgver}.tar.gz")
+md5sums=('2863156ca18f73deb75501a4fc0d6937' )
 
 build() {
-  cd $${pkgbase}-${pkgver}
+  cd ${pkgbase}-${pkgver}
 
   ./configure --prefix=/usr
-  make CXXFLAGS="-std=c++11"
+  make
 }
 
 check() {

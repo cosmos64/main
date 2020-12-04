@@ -1,25 +1,28 @@
 
+# rebuild mpv on any update
 pkgname=ffmpeg
-pkgver=3.2
-pkgrel=1
+pkgver=4.3.1
+pkgrel=2
 pkgdesc="Complete and free Internet live audio and video broadcasting solution for Linux/Unix"
 arch=('x86_64')
-url="http://ffmpeg.org/"
+url="https://ffmpeg.org/"
 license=('GPL')
-depends=('bzip2' 'lame' 'sdl' 'libvorbis' 'xvidcore' 'zlib' 'x264' 'libtheora' 'celt' 'fribidi'
-         'opencore-amr' 'alsa-lib' 'libvdpau' 'libxfixes' 'schroedinger' 'libvpx>=1.1.0' 'libwebp'
+depends=('bzip2' 'lame' 'sdl2' 'libvorbis' 'xvidcore' 'zlib' 'x264' 'libtheora' 'fribidi'
+         'opencore-amr' 'alsa-lib' 'libvdpau' 'libxfixes' 'libvpx' 'libwebp'
          'libva' 'openjpeg' 'rtmpdump' 'speex' 'gsm' 'pulseaudio' 'v4l-utils' 'gnutls' 'x265'
-         'libass' 'dcadec')
+         'libass' 'dcadec' 'opus' 'dav1d' 'avisynthplus')
 makedepends=('yasm')
-source=("http://ffmpeg.org/releases/${pkgname}-${pkgver}.tar.xz")
-md5sums=('3c065fb5baae1aeb1494a09ac984b2de')
+source=("https://ffmpeg.org/releases/${pkgname}-${pkgver}.tar.xz"
+        'openjpeg2.2.patch')
+md5sums=('5d1956bb552e91dc3b8287db346d0d58'
+         'e70179f9572035a655c297a2892fae08')
 
 build() {
   cd ${pkgname}-${pkgver}
+  #patch -p1 -i ${srcdir}/openjpeg2.2.patch
 
   ./configure --prefix=/usr \
               --enable-avisynth \
-              --enable-avresample \
               --enable-libmp3lame \
               --enable-libvorbis \
               --enable-libxvid \
@@ -30,10 +33,9 @@ build() {
               --enable-libgsm \
               --enable-postproc \
               --enable-shared \
-              --enable-x11grab \
               --enable-libopencore_amrnb \
               --enable-libopencore_amrwb \
-              --enable-libschroedinger \
+              --enable-libopus \
               --enable-libopenjpeg \
               --enable-librtmp \
               --enable-libpulse \
@@ -45,19 +47,20 @@ build() {
               --enable-swresample \
               --enable-libspeex \
               --enable-libv4l2 \
-              --enable-libcelt \
               --enable-libfribidi \
               --enable-libass \
+              --enable-libdav1d \
               --disable-debug \
               --disable-static
 
   make
   make tools/qt-faststart
-  make doc/ff{mpeg,play,server}.1
+  make doc/ff{mpeg,play}.1
 }
 
 package() {
   cd ${pkgname}-${pkgver}
+  
   make DESTDIR=${pkgdir} install install-man
   install -D -m755 tools/qt-faststart ${pkgdir}/usr/bin/qt-faststart
 }

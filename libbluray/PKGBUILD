@@ -1,20 +1,21 @@
 
 pkgname=libbluray
-pkgver=0.9.3
+pkgver=1.2.1
 pkgrel=1
 pkgdesc="Library to access Blu-Ray disks for video playback"
 arch=('x86_64')
-url="http://www.videolan.org/developers/libbluray.html"
+url="https://www.videolan.org/developers/libbluray.html"
 license=('LGPL2.1')
 depends=('libxml2' 'freetype2' 'fontconfig')
+makedepends=('apache-ant')
 options=('!libtool')
-source=("http://ftp.videolan.org/pub/videolan/libbluray/${pkgver}/${pkgname}-${pkgver}.tar.bz2")
-md5sums=('c51fd34f933431559371be30b59cff51')
+source=("https://download.videolan.org/pub/videolan/libbluray/${pkgver}/${pkgname}-${pkgver}.tar.bz2")
+sha512sums=('e9eeee433034266e88c05ae3469c0bd2bf700d7f16e17ad706f48426c143c823e83c16ab79a637f1e85e4eb858aa0577630671f87ba35d179db2a1d8bc8545c4')
 
 build() {
   cd ${pkgname}-${pkgver}
   
-  ./configure --prefix=/usr --disable-static --disable-bdjava
+  ./configure --prefix=/usr --disable-static
   make
 }
 

@@ -1,25 +1,24 @@
 
 pkgname=pyalpm
-pkgver=0.7
-pkgrel=2
-pkgdesc="Libalpm bindings for Python 3"
+pkgver=0.9.2
+pkgrel=1
+pkgdesc="C extension for Python 3 that give access to the libalpm API for package management"
 arch=('x86_64')
-url="http://projects.archlinux.org/users/remy/pyalpm.git/"
+url="https://gitlab.archlinux.org/archlinux/pyalpm"
 license=('GPL')
 depends=('python3' 'pacman')
-source=("https://sources.archlinux.org/other/pyalpm/$pkgname-$pkgver.tar.gz")
-md5sums=('35b4d2f3b73b0f2cf49ed436ec8a0568')
+makedepends=('python3-setuptools')
+source=("https://gitlab.archlinux.org/archlinux/pyalpm/-/archive/${pkgver}/${pkgname}-${pkgver}.tar.bz2")
+md5sums=('7ed0e43c9add3ec7a31428caf63e0240')
 
 build() {
-  cd ${srcdir}/${pkgname}-$pkgver
-  export CFLAGS="$CFLAGS -Wno-format"
-  sed -i "s/'-Werror',//" setup.py
+  cd ${pkgname}-${pkgver}
 
   python3 setup.py build
 }
 
 package() {
-  cd ${srcdir}/${pkgname}-$pkgver
+  cd ${pkgname}-${pkgver}
 
   python3 setup.py install --root=${pkgdir}
 }

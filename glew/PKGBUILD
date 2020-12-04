@@ -1,15 +1,15 @@
 
 pkgname=glew
-pkgver=2.0.0
+pkgver=2.2.0
 pkgrel=1
 pkgdesc="A cross-platform C/C++ extension loading library"
 arch=('x86_64')
 url="http://glew.sourceforge.net"
 license=('BSD' 'MIT' 'GPL')
 depends=('libxmu' 'libxi' 'mesa' 'glu')
-makedepends=('cmake' 'python2')
-source=("http://downloads.sourceforge.net/glew/${pkgname}-${pkgver}.tgz")
-md5sums=('2a2cd7c98f13854d2fcddae0d2b20411')
+makedepends=('cmake')
+source=("https://downloads.sourceforge.net/glew/${pkgname}-${pkgver}.tgz")
+md5sums=('3579164bccaef09e36c0af7f4fd5c7c7')
 
 build() {
   mkdir -p build

@@ -1,28 +1,31 @@
 
 pkgname=emacs-nox
-pkgver=25.1
+pkgver=27.1
 pkgrel=1
 pkgdesc='The Emacs Editor, without X11 support'
 arch=('x86_64')
-url="http://www.gnu.org/software/emacs/emacs.html"
+url="https://www.gnu.org/software/emacs/emacs.html"
 license=('GPL3')
 depends=('dbus' 'ncurses' 'perl' 'gpm' 'libxpm')
 provides=('emacs')
-conflicts=('emacs' 'emacs-cvs')
 options=('docs')
-source=("ftp://ftp.gnu.org/gnu/emacs/emacs-${pkgver}.tar.gz")
-md5sums=('95c12e6a9afdf0dcbdd7d2efa26ca42c')
+source=("https://ftp.gnu.org/gnu/emacs/emacs-${pkgver}.tar.xz")
+md5sums=('f1f25356b68ec69caccd41d95988d23d')
 
 build() {
-  cd ${srcdir}/emacs-$pkgver
+  cd emacs-$pkgver
 
-  ./configure --prefix=/usr --sysconfdir=/etc --libexecdir=/usr/lib \
-    --localstatedir=/var --without-x --without-sound
+  ./configure --prefix=/usr \
+    --sysconfdir=/etc \
+    --libexecdir=/usr/lib \
+    --localstatedir=/var \
+    --without-x \
+    --without-sound
   make
 }
 
 package() {
-  cd ${srcdir}/emacs-$pkgver
+  cd emacs-$pkgver
   make DESTDIR=${pkgdir} install
 
   #remove conflicts
@@ -36,10 +39,4 @@ package() {
   find ${pkgdir}/usr/share/emacs/$pkgver -exec chown root.root {} \;
   #remove .desktop file and icons
   rm -rf ${pkgdir}/usr/share/{applications,icons}
-
-  # fix perms on /var/games
-  chmod 775 ${pkgdir}/var/games
-  chmod 775 ${pkgdir}/var/games/emacs
-  chmod 664 ${pkgdir}/var/games/emacs/*
-  chown -R root:games ${pkgdir}/var/games
 }

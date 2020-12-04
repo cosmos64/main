@@ -1,32 +1,32 @@
 
 pkgname=at-spi2-core
-pkgver=2.22.0
-_pkgver=2.22
+pkgver=2.38.0
+_pkgver=2.38
 pkgrel=1
 pkgdesc="Protocol definitions and daemon for D-Bus at-spi"
 arch=('x86_64')
-url="http://www.gnome.org"
+url="https://www.gnome.org"
 license=('GPL2')
 depends=('dbus' 'glib2' 'libxtst')
-makedepends=('intltool' 'gobject-introspection')
+makedepends=('intltool' 'gobject-introspection' 'meson' 'ninja')
 options=('!libtool')
-source=("http://download.gnome.org/sources/at-spi2-core/${_pkgver}/${pkgname}-${pkgver}.tar.xz")
-md5sums=('3da5fe62a653e49dad1c47f9a46fee56')
+source=("https://download.gnome.org/sources/at-spi2-core/${_pkgver}/${pkgname}-${pkgver}.tar.xz")
+sha256sums=('84e36c3fe66862133f5fe229772b76aa2526e10de5014a3778f2fa46ce550da5')
 
 build() {
-  cd ${pkgname}-${pkgver}
-
-  sed -i -e '/AC_PATH_XTRA/d' configure.ac
-  autoreconf --force --install
-
-  ./configure --prefix=/usr --sysconfdir=/etc \
-    --libexecdir=/usr/lib/at-spi2-core --disable-xevie
-  make
+  mkdir -p build
+  cd build
+  
+  meson ../${pkgname}-${pkgver} \
+    --prefix=/usr \
+    --buildtype=release \
+    --libexecdir=/usr/lib/at-spi2-core
+  ninja
 }
 
 package() {
-  cd ${pkgname}-${pkgver}
+  cd build
   
-  make DESTDIR=${pkgdir} install
+  DESTDIR=${pkgdir} ninja install
 }
 

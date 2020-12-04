@@ -1,26 +1,26 @@
 
 pkgname=qscintilla-qt5
-pkgver=2.9.3
+pkgver=2.11.6
 pkgrel=1
 license=('GPL')
 arch=('x86_64')
-url="http://www.riverbankcomputing.co.uk/software/qscintilla/intro"
+url="https://www.riverbankcomputing.com/software/qscintilla/intro"
 pkgdesc="A port to Qt of Neil Hodgson's Scintilla C++ editor class"
 depends=('qt5-base')
 makedepends=('chrpath' 'qt5-tools')
-source=("http://downloads.sourceforge.net/pyqt/QScintilla_gpl-${pkgver}.tar.gz"
+source=("https://www.riverbankcomputing.com/static/Downloads/QScintilla/${pkgver}/QScintilla-${pkgver}.tar.gz"
         'qt5_libname.patch')
-md5sums=('3b1cdbce9ef6c28cd868bcc58219f96e'
-         'c6945e86d8eaf3b1985974f23dfbf057')
+sha1sums=('fe010886e59996b53e38811f67993262220c8ae5'
+          'bc78815afa7e9df2c6c4acb412d7f91ada2a9834')
 
 prepare() {
-    cd QScintilla_gpl-${pkgver}
+    cd QScintilla-${pkgver}
 
-    patch -p1 -i ${srcdir}/qt5_libname.patch
+    #patch -p1 -i ${srcdir}/qt5_libname.patch
 }
 
 build() {
-    cd QScintilla_gpl-${pkgver}
+    cd QScintilla-${pkgver}
 
     cd Qt4Qt5
     /usr/lib/qt5/bin/qmake qscintilla.pro
@@ -28,7 +28,7 @@ build() {
 }
 
 package() {
-    cd QScintilla_gpl-${pkgver}/Qt4Qt5
+    cd QScintilla-${pkgver}/Qt4Qt5
     
     make DESTDIR=${pkgdir} INSTALL_ROOT=${pkgdir} install
 }

@@ -1,6 +1,6 @@
 
 pkgname=libffado
-pkgver=2.3.0
+pkgver=2.4.4
 pkgrel=1
 pkgdesc="Driver for FireWire audio devices"
 arch=('x86_64')
@@ -9,21 +9,21 @@ license=('GPL')
 depends=('libiec61883' 'libavc1394' 'libsigc++' 'libxml++' 'alsa-lib' 'dbus' 'libconfig'
          'dbus-c++')
 makedepends=('scons' 'jack')
-source=("http://www.ffado.org/files/${pkgname}-${pkgver}.tgz"
-        'glibmm2.46.patch')
-md5sums=('8f452977267200cfaf9b8e16ba3c92df'
-         '8f6ae7707c3bb018543f001ad513ba52')
+source=("http://www.ffado.org/files/${pkgname}-${pkgver}.tgz")
+md5sums=('f27970e21a80a1e9ccc1842c4a6a3c62')
 
 prepare() {
   cd ${pkgname}-${pkgver}
   
-  #patch -p1 -i $srcdir/glibmm2.46.patch
+  #patch -p1 -i $srcdir/gcc6.patch
+  #sed -i -e 's|which pyuic4|which pyuic5|g' SConstruct
+  #sed -i -e 's|dbus.mainloop.qt|dbus.mainloop.pyqt5|g' SConstruct
 }
 
 build() {
   cd ${pkgname}-${pkgver}
 
-  scons PREFIX=/usr ENABLE_OPTIMIZATIONS=yes UDEVDIR=/usr/lib/udev/rules.d COMPILE_FLAGS="$CFLAGS -std=gnu++11"
+  scons PREFIX=/usr ENABLE_OPTIMIZATIONS=yes UDEVDIR=/usr/lib/udev/rules.d 
 }
 
 package() {

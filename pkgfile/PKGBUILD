@@ -1,30 +1,32 @@
 
 pkgname=pkgfile
-pkgver=15
+pkgver=21
 pkgrel=3
 pkgdesc="An alpm .files metadata explorer"
 arch=('x86_64')
-url="http://github.com/falconindy/pkgfile"
+url="https://github.com/falconindy/pkgfile"
 license=('MIT')
 depends=('libarchive' 'curl' 'pcre' 'pacman')
+makedepends=('meson' 'ninja')
 install=pkgfile.install
-source=("http://code.falconindy.com/archive/${pkgname}/${pkgname}-${pkgver}.tar.xz")
-md5sums=('30b3c4f0b18a33ca0ce4538492093511')
+source=("https://github.com/falconindy/pkgfile/archive/v${pkgver}.tar.gz")
+md5sums=('6edfc7c84891ed0a32a0aa47949d6ee9')
 
 build() {
-  cd ${pkgname}-${pkgver}
+  mkdir -p build
+  cd build
 
-  ./configure --with-systemdsystemunitdir=/usr/lib/systemd/system
-  make
-
-  # generate a license file
-  sed '/\*\//q' src/pkgfile.c >LICENSE
+  meson ../${pkgname}-${pkgver} \
+    --prefix=/usr \
+    --buildtype=release \
+    --libexecdir=/usr/lib
+  ninja
+  
 }
 
 package() {
-  cd ${pkgname}-${pkgver}
-  make DESTDIR=${pkgdir} install
+  cd build
   
-  install -Dm644 LICENSE ${pkgdir}/usr/share/licenses/${pkgname}/LICENSE
+  DESTDIR=${pkgdir} ninja install
 }
 

@@ -1,25 +1,21 @@
 
 pkgname=libgphoto2
-pkgver=2.5.10
+pkgver=2.5.26
 pkgrel=1
 pkgdesc="The core library of gphoto2 with increased file limits"
 arch=('x86_64')
 url="http://www.gphoto.org"
 license=('LGPL')
-conflicts=('libgphoto2-nolimit')
-provides=('libgphoto2-nolimit')
-replaces=('libgphoto2-nolimit')
 depends=('libexif' 'libjpeg>=8' 'gd' 'libtool' 'libusb')
-install=libgphoto2.install
 options=('libtool')
-source=("http://downloads.sourceforge.net/gphoto/${pkgname}-${pkgver}.tar.bz2")
-md5sums=('f1e53e684a3ea51cc7958d7e4eee7f37')
+source=("https://downloads.sourceforge.net/gphoto/${pkgname}-${pkgver}.tar.bz2")
+md5sums=('7e7e18abe6a764cb4becb2728d86ed84')
 
 build() {
   cd ${pkgname}-${pkgver}
 
   #Change the limit which cause "Fixed limit exceeded"
-  sed -i "s#MAX_ENTRIES 1024#MAX_ENTRIES 8192#" libgphoto2/gphoto2-list.c
+  #sed -i "s|MAX_ENTRIES 1024|MAX_ENTRIES 8192|" libgphoto2/gphoto2-list.c
 
   ./configure \
     --prefix=/usr \

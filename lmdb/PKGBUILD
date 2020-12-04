@@ -1,26 +1,30 @@
 
 pkgname=lmdb
-pkgver=0.9.18
+pkgver=0.9.27
 pkgrel=1
 pkgdesc="Fast, ultra-compact key-value embedded data store developed by Symas for the OpenLDAP Project."
-url="http://symas.com/mdb"
+url="https://www.openldap.org/software/repo.html"
 license=('custom:OpenLDAP')
 depends=('gcc')
 arch=('x86_64')
-source=("https://github.com/LMDB/lmdb/archive/LMDB_${pkgver}.tar.gz")
-md5sums=('8b7eeb8a6c30b2763581de455d10441b')
+source=("https://git.openldap.org/openldap/openldap/-/archive/LMDB_${pkgver}/openldap-LMDB_${pkgver}.tar.bz2"
+        'lmdb.pc')
+md5sums=('5c62f6625021ac0225d65c40795610b2'
+         'cd669dad02d583d4774e81d0fc64b004')
 
 build() {
-  cd lmdb-LMDB_${pkgver}/libraries/liblmdb
+  cd openldap-LMDB_${pkgver}/libraries/liblmdb
 
   make prefix=/usr
 }
 
 package() {
-  cd lmdb-LMDB_${pkgver}/libraries/liblmdb
+  cd openldap-LMDB_${pkgver}/libraries/liblmdb
   install -m755 -d ${pkgdir}/usr/{bin,lib,include,man/man1,share}
   
   make DESTDIR=${pkgdir} prefix=/usr install
-  mv $pkgdir/usr/man $pkgdir/usr/share/man
+  mv ${pkgdir}/usr/man ${pkgdir}/usr/share/man
+  
   install -m644 -D LICENSE ${pkgdir}/usr/share/licenses/${pkgname}/LICENSE
+  install -m644 -D ${srcdir}/lmdb.pc ${pkgdir}/usr/lib/pkgconfig/lmdb.pc
 }

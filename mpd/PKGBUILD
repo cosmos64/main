@@ -1,52 +1,46 @@
 
 pkgname=mpd
-pkgver=0.19.19
-pkgrel=3
+pkgver=0.22.3
+_pkgver=0.22
+pkgrel=1
 pkgdesc="Music daemon that plays MP3, FLAC, and Ogg Vorbis files"
 arch=('x86_64')
 license=('GPL')
-url="http://www.musicpd.org/"
+url="https://www.musicpd.org/"
 depends=('libao' 'ffmpeg' 'libmodplug' 'audiofile' 'libshout' 'libmad' 'curl' 'faad2'
-         'sqlite' 'jack' 'libmms' 'wavpack' 'libmpcdec' 'avahi' 'libid3tag' 'libmpdclient'
-         'pulseaudio' 'mpg123' 'yajl' 'sdl_sound' 'libcdio-paranoia' 'fluidsynth' 'boost-libs'
-         'libsoxr' 'libnfs' 'zziplib' 'zip' 'libupnp')
-makedepends=('boost' 'xmlto') #'doxygen' 
+         'sqlite' 'jack' 'libmms' 'wavpack' 'avahi' 'libid3tag' 'libmpdclient'
+         'pulseaudio' 'mpg123' 'yajl' 'sdl_sound' 'fluidsynth' 'boost-libs'
+         'libsoxr' 'libnfs' 'zziplib' 'zip' 'libupnp' 'libgme' 'opus' 'udisks2'
+         'chromaprint' 'libcdio-paranoia' 'openal')
+makedepends=('boost' 'xmlto' 'meson' 'ninja') # 'python3-sphinx')  
 install=${pkgname}.install
 backup=('etc/mpd.conf')
-source=("http://www.musicpd.org/download/mpd/stable/mpd-${pkgver}.tar.xz"
+source=("https://www.musicpd.org/download/mpd/${_pkgver}/mpd-${pkgver}.tar.xz"
         'tmpfiles.d'
         'conf')
-md5sums=('6e4fca9a9c26dad08b61bac9a91802db'
+md5sums=('2e976ff8ee8790b9face4af8e4e0ec27'
          'e5cdccd201610a41e957d684ebc38985'
          'ca16fc9ce20ca382b620cd366c95647e')
 
 build() {
-  cd ${pkgname}-${pkgver}
-
-  ./configure --prefix=/usr \
+  mkdir -p build
+  cd build
+  
+  meson ../${pkgname}-${pkgver} \
+    --prefix=/usr \
+    --buildtype=release \
     --sysconfdir=/etc \
-    --enable-jack \
-    --enable-pulse \
-    --enable-libmpdclient \
-    --disable-documentation \
-    --enable-pipe-output \
-    --disable-libwrap \
-    --disable-sidplay \
-    --enable-zzip \
-    --with-systemdsystemunitdir=/usr/lib/systemd/system
-  make
+    -Dsystemd_system_unit_dir=/usr/lib/systemd/system \
+    -Dsystemd_user_unit_dir=/usr/lib/systemd/user \
+    -Ddocumentation=disabled
+  ninja
 }
 
 package() {
-   cd ${pkgname}-${pkgver}
-   make DESTDIR=${pkgdir} install
+   cd build
+   DESTDIR=${pkgdir} ninja install
    
    install -Dm644 ../conf ${pkgdir}/etc/mpd.conf
    install -Dm644 ../tmpfiles.d ${pkgdir}/usr/lib/tmpfiles.d/mpd.conf
    install -d -g 45 -o 45 ${pkgdir}/var/lib/mpd/playlists
-
-   install -Dm644 ${pkgdir}/usr/lib/systemd/{system,user}/mpd.service
-   sed '/WantedBy=/c WantedBy=default.target' -i ${pkgdir}/usr/lib/systemd/system/mpd.service
-   sed '/WantedBy=/c WantedBy=default.target' -i ${pkgdir}/usr/lib/systemd/user/mpd.service
-   sed '/\[Service\]/a User=mpd' -i ${pkgdir}/usr/lib/systemd/system/mpd.service
 }

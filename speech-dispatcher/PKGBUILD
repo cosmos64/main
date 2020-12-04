@@ -1,13 +1,14 @@
 
 pkgname=speech-dispatcher
-pkgver=0.8.5
+pkgver=0.10.2
 pkgrel=1
 arch=('x86_64')
-url="http://www.freebsoft.org/speechd"
+url="https://devel.freebsoft.org/speechd"
 pkgdesc="High-level device independent layer for speech synthesis interface"
 license=('GPL2' 'FDL')
 depends=('glib2' 'libtool' 'dotconf' 'pyxdg' 'pulseaudio' )
 makedepends=('intltool' 'espeak')
+optdepends=('espeak: Text-To-Speak (TTS) engine')
 backup=(etc/speech-dispatcher/clients/emacs.conf
         etc/speech-dispatcher/modules/ibmtts.conf
         etc/speech-dispatcher/modules/espeak-generic.conf
@@ -22,10 +23,12 @@ backup=(etc/speech-dispatcher/clients/emacs.conf
         etc/speech-dispatcher/modules/epos-generic.conf
         etc/speech-dispatcher/modules/flite.conf
         etc/speech-dispatcher/speechd.conf)
-options=('!libtool') 
-source=("http://www.freebsoft.org/pub/projects/speechd/$pkgname-$pkgver.tar.gz"
+options=('!libtool')
+install=speech-dispatcher.install
+#source=("https://devel.freebsoft.org/pub/projects/speechd/${pkgname}-${pkgver}.tar.gz"
+source=("https://github.com/brailcom/speechd/releases/download/${pkgver}/${pkgname}-${pkgver}.tar.gz"
         'speech-dispatcherd.service')
-md5sums=('0c89e02586c66733751fca1408333ccd'
+md5sums=('ace54a15e1d235d7dbdac3ac99004a5b'
          '0f09abe1af4eb79885ba88a1c2bcde8b')
 
 
@@ -42,4 +45,6 @@ package() {
 
   install -Dm644 ${srcdir}/speech-dispatcherd.service ${pkgdir}/usr/lib/systemd/system/speech-dispatcherd.service
   install -d ${pkgdir}/var/log/speech-dispatcher
+  
+  #sed -i -e 's|# DisableAutoSpawn|DisableAutoSpawn|' ${pkgdir}/etc/speech-dispatcher/speechd.conf
 }

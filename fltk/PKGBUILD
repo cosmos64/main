@@ -1,22 +1,26 @@
 
 pkgname=fltk
-pkgver=1.3.3
+pkgver=1.3.5
+_pkgver=1.3.5
 pkgrel=3
 pkgdesc="Graphical user interface toolkit for X."
 arch=('x86_64')
-screenshot="http://www.fltk.org/images/fltk-widgets-std.png"
 license=('custom:LGPL')
-url="http://www.fltk.org/"
+url="https://www.fltk.org/"
 depends=('libjpeg-turbo' 'libpng' 'libxft' 'libxinerama' 'hicolor-icon-theme'
-         'desktop-file-utils' 'xdg-utils' 'libgl' 'libxcursor' 'glu')
+         'desktop-file-utils' 'xdg-utils' 'libglvnd' 'libxcursor' 'glu')
 makedepends=('mesa' 'doxygen' 'alsa-lib')
 options=('!docs')
 groups=('system')
-source=("http://fltk.org/pub/fltk/${pkgver}/${pkgname}-${pkgver}-source.tar.gz")
-md5sums=('9ccdb0d19dc104b87179bd9fd10822e3')
+source=("https://fltk.org/pub/fltk/1.3.5/${pkgname}-${_pkgver}-source.tar.bz2"
+        'x-fluid.desktop')
+md5sums=('0de2b45a1896be2b4a8cafae89b84248'
+         '44cbb9e387f58c7de1bc9ed42d9a128f')
 
 build() {
-  cd ${pkgname}-${pkgver}
+  cd ${pkgname}-${_pkgver}
+  
+  cp ${srcdir}/x-fluid.desktop fluid/
 
   sed -i -e 's/$(LINKFLTK)/$(LINKSHARED)/' \
          -e 's/$(LINKFLTKIMG)/$(LINKSHARED)/' test/Makefile
@@ -33,7 +37,7 @@ build() {
 }
 
 package() {
-  cd ${pkgname}-${pkgver}
+  cd ${pkgname}-${_pkgver}
   make DESTDIR=${pkgdir} install
   ( cd fluid && make DESTDIR=${pkgdir} install install-linux )
 

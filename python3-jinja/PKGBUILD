@@ -1,21 +1,21 @@
 
 pkgname=python3-jinja
-pkgver=2.8
-pkgrel=1
+pkgver=2.11.2
+pkgrel=2
 pkgdesc="A simple pythonic template language written in Python"
 arch=('x86_64')
-url="http://jinja.pocoo.org/2/"
+url="https://palletsprojects.com/p/jinja/"
 license=('BSD')
 depends=('python3-markupsafe' 'python3-setuptools')
 makedepends=('python3')
-source=("http://pypi.python.org/packages/source/J/Jinja2/Jinja2-$pkgver.tar.gz")
-md5sums=('edb51693fe22c53cee5403775c71a99e')
+source=("https://files.pythonhosted.org/packages/source/J/Jinja2/Jinja2-${pkgver}.tar.gz")
+sha256sums=('89aab215427ef59c34ad58735269eb58b1a5808103067f7bb9d5836c651b3bb0')
 
 package() {
-  cd "$srcdir/Jinja2-$pkgver"
+  cd Jinja2-${pkgver}
 
-  python3 setup.py install --root="$pkgdir" -O1
+  python3 setup.py install --root=${pkgdir} -O1
 
-  install -Dm644 LICENSE "$pkgdir/usr/share/licenses/$pkgname/LICENSE"
+  install -Dm644 LICENSE.rst ${pkgdir}/usr/share/licenses/${pkgname}/LICENSE.rst
 }
 

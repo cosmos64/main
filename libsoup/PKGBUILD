@@ -1,35 +1,33 @@
 
 pkgname=libsoup
-pkgver=2.56.0
-_pkgver=2.56
+pkgver=2.72.0
+_pkgver=2.72
 pkgrel=1
 pkgdesc="GNOME HTTP Library - base library"
 arch=('x86_64')
+url="https://www.gnome.org"
 license=('LGPL')
 depends=('glib2' 'libxml2' 'gnutls' 'sqlite3' 'glib-networking')
-makedepends=('intltool' 'gobject-introspection' 'libgnome-keyring' 'vala')
-url="http://www.gnome.org"
-source=("http://ftp.gnome.org/pub/gnome/sources/libsoup/${_pkgver}/${pkgname}-${pkgver}.tar.xz")
+makedepends=('intltool' 'gobject-introspection' 'vala' 'meson' 'ninja')
 options=('!libtool' '!emptydirs')
-provides=('libsoup-gnome')
-replaces=('libsoup-gnome')
-conflicts=('libsoup-gnome')
-md5sums=('465083f74b7bb035959ddb0599313986')
+source=("https://ftp.gnome.org/pub/gnome/sources/libsoup/${_pkgver}/${pkgname}-${pkgver}.tar.xz")
+sha256sums=('170c3f8446b0f65f8e4b93603349172b1085fb8917c181d10962f02bb85f5387')
 
 build() {
-  cd ${pkgname}-${pkgver}
+  mkdir -p build
+  cd build
   
-  ./configure --prefix=/usr \
-      --sysconfdir=/etc \
-      --localstatedir=/var \
-      --disable-static \
-      --disable-tls-check \
-      --without-gnome 
-  make 
+  meson ../${pkgname}-${pkgver} \
+    --prefix=/usr \
+    --buildtype=release \
+    --libexecdir=/usr/lib/${pkgname} \
+    -Dgnome=false \
+    -Dtls_check=false
+  ninja
 }
 
 package() {
-  cd ${pkgname}-${pkgver}
+  cd build
   
-  make DESTDIR=${pkgdir} install 
+  DESTDIR=${pkgdir} ninja install
 }

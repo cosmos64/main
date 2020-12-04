@@ -1,34 +1,38 @@
 
 pkgname=libindi
 _pkgname=indi
-pkgver=1.3
-_pkgver=1.3
+pkgver=1.8.7
+_pkgver=1.8.7
 pkgrel=1
 pkgdesc="Interface control protocol providing backend driver support and
         automation for a wide range of Astronomical devices (telescopes, focusers, CCDs..etc)."
-url="http://indi.sourceforge.net/"
+url="https://www.indilib.org/"
 license=('GPL2')
 arch=('x86_64')
-depends=('gcc-libs' 'zlib' 'libnova' 'cfitsio' 'libusb' 'boost-libs' 'libjpeg-turbo' 'gsl' 'qt5-base')
-makedepends=('boost' 'cmake')
-source=("https://sourceforge.net/projects/indi/files/${_pkgname}-${pkgver}.zip")
+depends=('gcc-libs' 'zlib' 'libnova' 'cfitsio' 'libusb' 'boost-libs' 'libjpeg-turbo' 'gsl'
+         'qt5-base' 'libtheora' 'fftw')
+makedepends=('boost' 'cmake' 'googletest')
+source=("https://github.com/indilib/indi/archive/v${pkgver}.tar.gz")
 options=('!libtool')
-md5sums=('1104a3343b9728637c58eeb680fbd575')
+md5sums=('9b9809ef04603815621428660a177aa8')
 
 build() {
-     mkdir -p build
-     cd build
-     
-     cmake ../${_pkgname}-${pkgver}/${pkgname} \
-        -DCMAKE_BUILD_TYPE=Release \
-        -DCMAKE_INSTALL_PREFIX=/usr \
-        -DUDEVRULES_INSTALL_DIR=/usr/lib/udev/rules.d \
-        -DCMAKE_INSTALL_LIBDIR=lib
-     make
+    mkdir -p build
+    cd build
+
+    cmake ../${_pkgname}-${pkgver} \
+    -DCMAKE_BUILD_TYPE=Release \
+    -DCMAKE_INSTALL_PREFIX=/usr \
+    -DUDEVRULES_INSTALL_DIR=/usr/lib/udev/rules.d \
+    -DCMAKE_INSTALL_LIBDIR=lib \
+    -DINDI_BUILD_QT5_CLIENT=ON
+    make
 }
 
 package() {
-     cd build 
-     
-     make DESTDIR=${pkgdir} install
+    cd build 
+    make DESTDIR=${pkgdir} install
+    # systemd errors becuase of non-existing plugdev group
+    sed -e 's|GROUP="plugdev", MODE="0666"|TAG+="uaccess"|' -i ${pkgdir}/usr/lib/udev/rules.d/99-vantage.rules
+    #sed -e 's|GROUP="plugdev", MODE="0666"|TAG+="uaccess"|' -i ${pkgdir}/usr/lib/udev/rules.d/99-perfectstar.rules
 }

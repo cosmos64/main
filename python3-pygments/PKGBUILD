@@ -1,0 +1,19 @@
+
+pkgname=python3-pygments
+pkgver=2.7.2
+pkgrel=1
+pkgdesc="Python syntax highlighter"
+arch=('x86_64')
+url="https://pygments.org/"
+license=('BSD')
+depends=('python3-setuptools')
+source=("https://pypi.org/packages/source/P/Pygments/Pygments-${pkgver}.tar.gz")
+sha256sums=('381985fcc551eb9d37c52088a32914e00517e57f4a21609f48141ba08e193fa0')
+
+package() {
+  cd Pygments-${pkgver}
+  python3 setup.py install --root=${pkgdir} -O1
+
+  install -Dm644 external/pygments.bashcomp ${pkgdir}/etc/bash_completion.d/pygments
+  install -Dm644 LICENSE ${pkgdir}/usr/share/licenses/${pkgname}/LICENSE
+}

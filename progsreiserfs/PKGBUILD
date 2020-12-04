@@ -1,10 +1,10 @@
 
 pkgname=progsreiserfs
 pkgver=0.3.0.5
-pkgrel=10
+pkgrel=12
 pkgdesc="library for accessing and manipulating reiserfs partitions"
 arch=('x86_64')
-url="http://reiserfs.linux.kiev.ua/"
+url="https://reiserfs.osdn.org.ua/"
 license=('GPL')
 depends=('e2fsprogs')
 options=('!libtool')
@@ -18,7 +18,7 @@ build() {
   patch -p1 -i ${srcdir}/fix-underquoted-definition.patch
 
   ./configure --prefix=/usr \
-              --mandir=/usr/share/man
+    --mandir=/usr/share/man
 
   make
 }

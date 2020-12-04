@@ -1,48 +1,52 @@
 
 pkgname=gst-plugins-bad
-pkgver=1.10.0
+pkgver=1.18.1
 pkgrel=1
 pkgdesc="GStreamer Multimedia Framework Bad Plugins"
 arch=('x86_64')
 license=('LGPL')
-url="http://gstreamer.freedesktop.org/"
+url="https://gstreamer.freedesktop.org/"
 depends=('mjpegtools' 'gst-plugins-base' 'curl' 'chromaprint' 'libmms' 'faad2'
-         'mpg123' 'faac' 'celt' 'libdca' 'soundtouch' 'libdvdnav'
+         'mpg123' 'faac' 'libdca' 'soundtouch' 'libdvdnav'
          'libmodplug' 'libgme' 'opus' 'wayland' 'neon' 'libofa' 'fluidsynth' 'openjpeg'
          'libwebp' 'libsrtp' 'gnutls' 'librsvg' 'libpng' 'libgudev' 'sbc' 'glu'
-         'qt5-x11extras' 'x265')
-makedepends=('schroedinger' 'libexif' 'libdvdread' 'libvdpau' 'libmpeg2' 'python3' 
+         'qt5-x11extras' 'x265' 'libass' 'schroedinger' 'nettle' 'libdvdread'
+         'vulkan-validationlayers' 'microdns' 'libnice')
+makedepends=('libexif' 'libvdpau' 'libmpeg2' 'python3' 'meson' 'ninja'
              'gobject-introspection' 'bluez' 'ladspa' 'openal' 'qt5-wayland')
 options=('!libtool' '!emptydirs')
-source=("http://gstreamer.freedesktop.org/src/gst-plugins-bad/${pkgname}-${pkgver}.tar.xz")
-md5sums=('86916b5c8e5923cc070c1548f270e9b9')
+source=("https://gstreamer.freedesktop.org/src/gst-plugins-bad/${pkgname}-${pkgver}.tar.xz")
+sha256sums=('c195978c85d97406c05eb9d43ac54b9ab35eda6ffdae32b3ed597b8f1743c1b2')
+
+prepare() {
+  cd ${pkgname}-${pkgver}
+  # needed for neon 0.31 
+  # https://gitlab.freedesktop.org/gstreamer/gst-plugins-bad/-/commit/f10b424418e448211e3427a76fcd046e157ef0b7
+  #sed -e "s|<= 0.30.99|<= 0.31.99|" -i ext/neon/meson.build
+}
 
 build() {
-  cd ${pkgname}-${pkgver}
+  mkdir -p build
+  cd build
   
-  CXXFLAGS="-std=c++11"
-  
-  ./configure --prefix=/usr \
+  meson ../${pkgname}-${pkgver} \
+    --prefix=/usr \
+    --buildtype=release \
     --sysconfdir=/etc \
     --localstatedir=/var \
-    --disable-static \
-    --enable-experimental \
-    --with-package-name="GStreamer (KaOS)" \
-    --with-package-origin="http://kaosx.us"
-    
-  sed -i -e 's/ -shared / -Wl,-O1,--as-needed\0/g' libtool 
-  
-  make
+    -D package-name="GStreamer Bad Plugins (KaOS)" \
+    -D package-origin="https://kaosx.us"
+  ninja
 }
 
 check() {
-  cd ${pkgname}-${pkgver}
-  
-  make -k check || :
+  cd build
+  # 7 fail
+  meson test
 }
 
 package() {
-  cd ${pkgname}-${pkgver}
+  cd build
   
-  make DESTDIR=${pkgdir} install
+  DESTDIR=${pkgdir} ninja install
 }

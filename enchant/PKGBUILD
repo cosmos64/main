@@ -1,31 +1,35 @@
 
 pkgname=enchant
-pkgver=2.2.2
-_pkgver=2-2-2
-pkgrel=2
+pkgver=2.2.13
+pkgrel=1
+epoch=2
 pkgdesc="A wrapper library for generic spell checking"
 arch=('x86_64')
-url="http://www.abisource.com/enchant/"
+url="https://abiword.github.io/enchant/"
 license=('LGPL')
 depends=('aspell' 'dbus-glib' 'hunspell' 'hspell')
 options=('!libtool')
 #source=("http://www.abisource.com/downloads/enchant/${pkgver}/${pkgname}-${pkgver}.tar.gz")
-source=("https://github.com/AbiWord/enchant/archive/release-${_pkgver}.tar.gz")
-md5sums=('22c97e75d7dcab9615e97963eb01a7bb')
+source=("https://github.com/AbiWord/enchant/releases/download/v${pkgver}/${pkgname}-${pkgver}.tar.gz")
+md5sums=('5496cbce7b8d8fe72a4e5abc1739df58')
 
 build() {
-  cd ${pkgname}-release-${_pkgver}
+  cd ${pkgname}-${pkgver}
   
-  ./autogen.sh
   ./configure --prefix=/usr \
     --disable-static \
-    --disable-ispell \
-    --with-myspell-dir=/usr/share/myspell 
+    --enable-relocatable \
+    --with-zemberek
   make 
 }
 
 package() {
-  cd ${pkgname}-release-${_pkgver}
+  cd ${pkgname}-${pkgver}
   
-  make DESTDIR=${pkgdir} install 
+  make DESTDIR=${pkgdir} install
+  
+  ln -sfv enchant-2 ${pkgdir}/usr/include/enchant
+  ln -sfv enchant-2 ${pkgdir}/usr/bin/enchant
+  ln -sfv libenchant-2.so ${pkgdir}/usr/lib/libenchant.so
+  ln -sfv enchant-2.pc ${pkgdir}/usr/lib/pkgconfig/enchant.pc
 }

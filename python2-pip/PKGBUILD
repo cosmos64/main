@@ -1,14 +1,14 @@
 
 pkgname=python2-pip
-pkgver=8.1.2
+pkgver=20.3.1
 pkgrel=1
 pkgdesc="An easy_install replacement for installing pypi python2 packages"
-url="http://www.pip-installer.org/"
+url="https://pip.pypa.io"
 arch=('x86_64')
 license=('MIT')
 depends=('python2' 'python2-setuptools')
-source=("https://pypi.python.org/packages/e7/a8/7556133689add8d1a54c0b14aeff0acb03c64707ce100ecd53934da1aa13/pip-${pkgver}.tar.gz")
-md5sums=('87083c0b9867963b29f7aba3613e8f4a')
+source=("https://files.pythonhosted.org/packages/source/p/pip/pip-${pkgver}.tar.gz")
+sha256sums=('43f7d3811f05db95809d39515a5111dd05994965d870178a4fe10d5482f9d2e2')
 
 package() {
   cd pip-${pkgver}

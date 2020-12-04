@@ -1,26 +1,26 @@
 
 pkgname=xorg-fonts-alias
-pkgver=1.0.3
-pkgrel=2
+pkgver=1.0.4
+pkgrel=1
 pkgdesc="X.org font alias files"
 arch=('x86_64')
-url="http://xorg.freedesktop.org/"
+url="https://xorg.freedesktop.org/"
 license=('custom')
-source=("http://xorg.freedesktop.org/releases/individual/font/font-alias-${pkgver}.tar.bz2"
+source=("https://xorg.freedesktop.org/releases/individual/font/font-alias-${pkgver}.tar.bz2"
         'LICENSE')
-md5sums=('6d25f64796fef34b53b439c2e9efa562'
-         'ff91ae6d96d76130482d04653e7a836a')
+sha256sums=('f3111ae8bf2e980f5f56af400e8eefe5fc9f4207f4a412ea79637fd66c945276'
+            '95b6410246e011be36aad0710a36a25fbfd508269cf50d17c820b29f045f08cb')
 
 build() {
-  cd "${srcdir}/font-alias-${pkgver}"
+  cd font-alias-${pkgver}
   
   ./configure --prefix=/usr --with-fontrootdir=/usr/share/fonts
   make
 }
 
 package() {
-  cd "${srcdir}/font-alias-${pkgver}"
-  make DESTDIR="${pkgdir}" install
+  cd font-alias-${pkgver}
+  make DESTDIR=${pkgdir} install
   
-  install -Dm644 "${srcdir}/LICENSE" "${pkgdir}/usr/share/licenses/${pkgname}/LICENSE"
+  install -Dm644 ../LICENSE ${pkgdir}/usr/share/licenses/${pkgname}/LICENSE
 }

@@ -1,12 +1,13 @@
 
 pkgname=autofs
-pkgver=5.1.2
-pkgrel=1
+pkgver=5.1.6
+pkgrel=2
 pkgdesc='A kernel-based automounter for Linux.'
 arch=('x86_64')
-url='http://freshmeat.net/projects/autofs'
+url='https://git.kernel.org/pub/scm/linux/storage/autofs/autofs.git'
 license=('GPL2')
-depends=('libldap' 'libxml2' 'krb5' 'kmod')
+depends=('libldap' 'libxml2' 'krb5')
+makedepends=('kmod') # 'clang')
 backup=('etc/autofs/auto.master'
         'etc/autofs/auto.misc'
         'etc/autofs/auto.net'
@@ -14,19 +15,24 @@ backup=('etc/autofs/auto.master'
         'etc/autofs/autofs_ldap_auth.conf'
         'etc/default/autofs')
 options=('!makeflags')
-source=("http://www.kernel.org/pub/linux/daemons/${pkgname}/v5/${pkgname}-${pkgver}.tar.xz")
-md5sums=('130dadb63efd5cc585d19c9bf7f00268')
+source=("https://www.kernel.org/pub/linux/daemons/autofs/v5/${pkgname}-${pkgver}.tar.xz")
+sha256sums=('dddee3d9b7388ce6cb7432832dfade25b07ef68ad48dcce01cf247b26a10caef')
 
 build() {
   cd ${pkgname}-${pkgver}
+  
+  #export CC="clang"
+  #export CXX="clang++"
 
   sed -i -e 's|/etc/auto.misc|/etc/autofs/auto.misc|' \
          -e 's|/etc/auto.master.d|/etc/autofs/auto.master.d|' samples/auto.master
+  sed -i -e "/^SUBDIRS/s/$/ samples/g" Makefile.rules
 
   ./configure --prefix=/usr \
         --sysconfdir=/etc/autofs \
         --with-mapdir=/etc/autofs \
         --without-hesiod \
+        --disable-ext-env \
         --enable-ignore-busy \
         --with-systemd
   make
@@ -36,6 +42,5 @@ package() {
   cd ${pkgname}-${pkgver}
   make INSTALLROOT=${pkgdir} install
   
-  rm -r $pkgdir/run
   install -dm755 ${pkgdir}/etc/autofs/auto.master.d
 }

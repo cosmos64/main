@@ -1,48 +1,47 @@
 
 pkgname=texlive-bin
-pkgver=2016.41290
+pkgver=2020.56824
+#_pkgver=svn56824
+_commit=07b007ca4ee8022a15e1ae6cd927f3a36d9cc01e
 pkgrel=2
 pkgdesc="TeX Live binaries"
-url='http://tug.org/texlive/'
+url='https://tug.org/texlive/'
 license=('GPL')
 arch=('x86_64')
-depends=('t1lib' 'gd' 'poppler' 'libsigsegv' 'zziplib' 'libpng' 'libjpeg-turbo' 'freetype2'
+depends=('t1lib' 'gd' 'libsigsegv' 'zziplib' 'libpng' 'libjpeg-turbo' 'freetype2'
          'cairo' 'pixman' 'graphite' 'icu' 'harfbuzz' 'libpaper')
 makedepends=('perl' 'clisp' 'ffcall')
 optdepends=('ed: for texconfig')
 options=('!libtool' '!strip')
-install="texlive.install"
+#install="texlive.install"
 # full credit for this PKGBUILD goes to Rémy Oudompheng <remy@archlinux.org>
-source=("http://mirrors.kernel.org/archlinux/other/texlive/texlive-bin-source-${pkgver}.tar.xz"
-        'mktexlsr.hook'
-        'mktexlsr.script'
-        'texlive-updmap.hook'
-        'texlive-updmap.script')
-md5sums=('7303361f2d441eb5c962a996fd77e8fa'
-         '7bc9cef52d3b0c15d2364b7d8658faa6'
-         '2bbbef810687f4b2804a4b8cb91ce02f'
-         'c18cbbd000aac60813b1695aa058964f'
-         'c64d77b5111a26b9995263b49df4937c')
+#source=("https://mirrors.kernel.org/archlinux/other/texlive/texlive-bin-source-${pkgver}.tar.xz"
+source=("https://github.com/TeX-Live/texlive-source/archive/${_commit}.tar.gz"
+        'poppler0.8x.patch')
+md5sums=('8e131804a10af432a063199f75db5e06'
+         '5fa627950138922977baa71cbc3e2ff3')
 
 prepare() {
-   cd source
-   #patch -p2 -i "$srcdir"/poppler0.26.patch
+   cd texlive-source-${_commit}
+   
+   # t4ht expects to be in /usr/share/texmf/bin/t4ht
+   sed -i s/SELFAUTOPARENT/TEXMFROOT/ texk/tex4htk/t4ht.c
+
+   #cp -pv texk/web2c/pdftexdir/pdftoepdf{-poppler0.86.0,}.cc
+   #cp -pv texk/web2c/pdftexdir/pdftosrc{-poppler0.83.0,}.cc
+   
+   #patch -p1 -i ${srcdir}/poppler0.8x.patch
 }
 
 build() {
-
-   cd ${srcdir}
-   # t4ht expects to be in /usr/share/texmf/bin/t4ht
-   sed -i s/SELFAUTOPARENT/TEXMFROOT/ source/texk/tex4htk/t4ht.c
    #############################################################
    ### configure
-   cd source
-   ## prevent compiling Xdvi with libXp
-   sed -i~ 's|-lXp ||' texk/xdvik/configure
-   test ! -d Work && mkdir Work
+   cd texlive-source-${_commit}
+   mkdir -p Work
    cd Work
+   
    echo "--> Initial configuration..."
-   # we use temporary prefix to avoid messing the existing
+   # use temporary prefix to avoid messing the existing
    # $pkgdir/usr/share/texmf tree
    ../configure --prefix=/usr -C \
      --sysconfdir=/etc \
@@ -65,8 +64,7 @@ build() {
      --with-system-ncurses \
      --with-system-t1lib \
      --with-system-gd \
-     --with-system-poppler \
-     --with-system-xpdf \
+     --without-system-xpdf \
      --with-system-freetype2 \
      --with-system-pixman \
      --with-system-cairo \
@@ -93,11 +91,10 @@ build() {
 }
 
 package() {
-   cd "$srcdir"
+   cd texlive-source-${_commit}
 
    #############################################################
    ### install
-   cd source
    # fixes for xindy
    find utils/xindy -name Makefile -exec sed -i -e "s|^prefix =.\+$|prefix = $pkgdir/usr|" -e "s|^mandir =.\+$|mandir = \${prefix}/share/man|" -e "s|^datadir =.\+$|datadir = \${datarootdir}/texmf|" -e "s|^docdir =.\+$|docdir = \${datadir}/doc/xindy|" '{}' \;
 
@@ -114,7 +111,7 @@ package() {
    ln -s euptex ${pkgdir}/usr/bin/uplatex
    ln -s luatex ${pkgdir}/usr/bin/dvilualatex
    ln -s luatex ${pkgdir}/usr/bin/dviluatex
-   ln -s luatex ${pkgdir}/usr/bin/lualatex
+   ln -s luahbtex ${pkgdir}/usr/bin/lualatex
    ln -s pdftex ${pkgdir}/usr/bin/amstex
    ln -s pdftex ${pkgdir}/usr/bin/cslatex
    ln -s pdftex ${pkgdir}/usr/bin/csplain
@@ -138,18 +135,17 @@ package() {
    ln -s pdftex ${pkgdir}/usr/bin/xmltex
    ln -s xetex ${pkgdir}/usr/bin/xelatex
 
-   ## install pacman hooks
-   install -D -m644 ${srcdir}/mktexlsr.hook "$pkgdir/usr/share/libalpm/hooks/mktexlsr.hook"
-   install -D -m644 ${srcdir}/texlive-updmap.hook "$pkgdir/usr/share/libalpm/hooks/texlive-updmap.hook"
-   install -D -m755 ${srcdir}/mktexlsr.script "$pkgdir/usr/share/libalpm/scripts/mktexlsr"
-   install -D -m755 ${srcdir}/texlive-updmap.script "$pkgdir/usr/share/libalpm/scripts/texlive-updmap"
-
    #############################################################
    # remove dangling symlinks
    _bibtexextra_scripts="
-bibexport
+bbl2bib
+bib2gls
 bibdoiadd
+bibexport
+bibmradd
+biburl2doi
 bibzbladd
+convertgls2bib
 listbib
 ltx2crossrefxml
 multibibliography
@@ -169,12 +165,18 @@ autoinst
 bundledoc
 checkcites
 checklistings
+chklref
 chkweb
 cjk-gs-integrate
+cluttex
+cllualatex
+clxelatex
 context
 contextjit
+ctanbib
 ctanify
 ctanupload
+ctan-o-mat
 de-macro
 depythontex
 deweb
@@ -182,21 +184,36 @@ dosepsbin
 dtxgen
 dvi2fax
 dviasm
+dviinfox
 dvired
 e2pall
 epstopdf
 findhyph
 fmtutil
 fmtutil-sys
+fmtutil-user
 fontinst
 fragmaster
+ht
+htcontext
+htlatex
+htmex
+httex
+httexi
+htxelatex
+htxetex
 installfont-tl
+jfmutil
+ketcindy
 kpsepath
 kpsetool
 kpsewhere
 kpsexpand
 latex-git-log
+latex-papersize
 latex2man
+latex2nemeth
+latexdef
 latexdiff
 latexdiff-vc
 latexfileversion
@@ -207,34 +224,31 @@ latexrevise
 listings-ext.sh
 ltxfileinfo
 ltximg
-lua2dox_filter
 luaotfload-tool
 luatools
+lwarpmk
 make4ht
 match_parens
 mf2pt1
+mk4ht
 mkjobtexmf
 mkt1font
 mktexfmt
+mktexlsr
+mktexmf
+mktexpk
+mktextfm
 mptopdf
 mtxrun
 mtxrunjit
 ot2kpx
-pdf180
-pdf270
-pdf90
+pamphletangler
 pdfatfi
-pdfbook
 pdfbook2
 pdfcrop
-pdfflip
 pdfjam
-pdfjam-pocketmod
-pdfjam-slides3up
-pdfjam-slides6up
-pdfjoin
-pdfnup
-pdfpun
+pdflatexpicscale
+pdftex-quiet
 pdfxup
 pfarrei
 pkfix
@@ -262,21 +276,30 @@ texdoc
 texdoctk
 texexec
 texfot
+texhash
 texindy
 texlinks
 texliveonfly
 texloganalyser
 texmfstart
+texosquery
+texosquery-jre5
+texosquery-jre8
+texplate
 thumbpdf
+tlcockpit
+tlshell
 typeoutfileinfo
 updmap
 updmap-sys
+updmap-user
 vpl2ovp
 vpl2vpl
+xhlatex
+xindex
 xindy
 "
    _games_scripts="rubikrotation"
-   _htmlxml_scripts="ht htcontext htlatex htmex httex httexi htxelatex htxetex mk4ht"
    _humanities_scripts="diadia"
    _langcyrillic_scripts="rubibtex rumakeindex"
    _langextra_scripts="ebong"
@@ -285,11 +308,13 @@ xindy
 kanji-fontmap-creator
 kanji-config-updmap
 kanji-config-updmap-sys
+kanji-config-updmap-user
 "
    _langkorean_scripts="jamo-normalize komkindex ttf2kotexfont"
    _latexextra_scripts="
 authorindex
 exceltex
+l3build
 makedtx
 makeglossaries
 makeglossaries-lite
@@ -299,8 +324,10 @@ ps4pdf
 splitindex
 svn-multi
 vpe
+webquiz
+wordcount
 yplan"
-   _music_scripts="lily-glyph-commands lily-image-commands lily-rebuild-pdfs m-tx musixtex musixflx pmx2pdf pmxchords"
+   _music_scripts="lily-glyph-commands lily-image-commands lily-rebuild-pdfs m-tx musixtex musixflx pmxchords"
    _pictures_scripts="cachepic epspdf epspdftk fig4latex getmapdl mathspic mkpic pn2pdf"
    _pstricks_scripts="pedigree pst2pdf"
    _science_scripts="pygmentex ulqda"

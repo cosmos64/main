@@ -1,27 +1,28 @@
 
 pkgname=libpgf
-pkgver=6.14.12
-pkgrel=3
+pkgver=7.19.3
+pkgrel=2
 pkgdesc="One of the best image compression algorithms for natural images, best for natural and aerial images with a better compression efficiency than JPEG"
 arch=('x86_64')
-url="http://www.libpgf.org"
+url="https://www.libpgf.org"
 depends=('gcc-libs')
 makedepends=('doxygen' 'dos2unix')
 license=('GPL')
-source=("http://sourceforge.net/projects/libpgf/files/libpgf/${pkgver}/${pkgname}-src-${pkgver}.tar.gz")
-md5sums=('a2b13832e23ad9026bd249d57b6c26da')
+source=("https://sourceforge.net/projects/libpgf/files/libpgf/${pkgver}-latest/libPGF-codec-and-console-src.zip")
+md5sums=('795e3c1816f107ca3d763a6f40424fd3')
 
 build() {
-  cd ${pkgname}
+  cd libPGF-codec-and-console-src/PGF/Codec
   dos2unix configure.ac
   
-  ./autogen.sh
+  #./autogen.sh
+  autoreconf -i
   ./configure --prefix=/usr
   make
 }
 
 package() {
-  cd ${pkgname}
+  cd libPGF-codec-and-console-src/PGF/Codec
   
   make DESTDIR=${pkgdir} install
 }

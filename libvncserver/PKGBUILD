@@ -1,26 +1,40 @@
 
 pkgname=libvncserver
-pkgver=0.9.10
+pkgver=0.9.13
 pkgrel=1
 pkgdesc="The vnc library"
 arch=('x86_64')
-url="http://libvncserver.sourceforge.net/"
+url="https://libvnc.github.io/"
 license=('GPL')
-depends=('libjpeg-turbo' 'zlib' 'gnutls' 'libgcrypt')
+depends=('libjpeg-turbo' 'zlib' 'gnutls' 'libgcrypt' 'libpng')
+makedepends=('sdl2' 'cmake')
 options=('!libtool')
-source=("https://github.com/LibVNC/libvncserver/archive/LibVNCServer-${pkgver}.tar.gz")
-md5sums=('e1b888fae717b06896f8aec100163d27')
+source=("https://github.com/LibVNC/libvncserver/archive/LibVNCServer-${pkgver}.tar.gz"
+        "https://github.com/LibVNC/libvncserver/commit/d0a76539835d11c0f4723499f8be4bc9c7724eb9.diff"
+        "https://github.com/LibVNC/libvncserver/commit/5261c1ecabd8acde06fbfbf088c3c390d0d3afca.diff")
+md5sums=('503b5527b93dce77e8b6a45f273f6e39'
+         '78601ffd18237fd8ce34240242ee31ee'
+         '51a2f4302a06f8faed8ae95d3eb0cf33')
+
+prepare () {
+  cd ${pkgname}-LibVNCServer-${pkgver}
+
+  #patch -p1 -i ${srcdir}/d0a76539835d11c0f4723499f8be4bc9c7724eb9.diff
+  #patch -p1 -i ${srcdir}/5261c1ecabd8acde06fbfbf088c3c390d0d3afca.diff
+}    
 
 build() {
-  cd $srcdir/$pkgname-LibVNCServer-$pkgver
+  mkdir -p build
+  cd build
   
-  ./autogen.sh
-  ./configure --prefix=/usr
-  make
+  cmake ../${pkgname}-LibVNCServer-${pkgver} \
+    -DCMAKE_INSTALL_PREFIX=/usr \
+    -DCMAKE_BUILD_TYPE=Release
+  make 
 }
 
 package() {
-  cd $srcdir/$pkgname-LibVNCServer-$pkgver
+  cd build
   
-  make DESTDIR=$pkgdir install
+  make DESTDIR=${pkgdir} install
 }

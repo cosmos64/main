@@ -1,17 +1,22 @@
 
 pkgname=ttf-raleway
-pkgver=1
-pkgrel=5
+pkgver=4.101
+pkgrel=2
 pkgdesc="A sans-serif typeface"
 arch=('x86_64')
-url="http://theleagueofmoveabletype.com/raleway/"
+url="https://theleagueofmoveabletype.com/raleway/"
 license=('OFL')
 depends=('fontconfig' 'xorg-font-utils')
 install=ttf.install
-source=('http://www.impallari.com/media/uploads/prosources/update-35-source.zip')
-md5sums=('d61ac36dbb0efd1ffaddc78ab9a082f8')
+source=("https://github.com/theleagueof/raleway/releases/download/${pkgver}/Raleway-${pkgver}.tar.xz")
+#source=('Raleway.zip')
+md5sums=('edededf8129ceb237aaa070bc1ead73a')
 
 package() {
+    cd Raleway-${pkgver}
+    
     install -d ${pkgdir}/usr/share/fonts/TTF/
-    install -m644 ${srcdir}/raleway-family-v2/Raleway-Thin.ttf ${pkgdir}/usr/share/fonts/TTF/
+    install -Dm644 static/TTF/*.ttf ${pkgdir}/usr/share/fonts/TTF/
+    
+    install -Dm644 OFL.md ${pkgdir}/usr/share/licenses/${pkgname}/OFL.md
 }

@@ -1,11 +1,11 @@
 
 pkgname=raptor
 pkgver=2.0.15
-pkgrel=5
+pkgrel=12
 pkgdesc="A C library that parses RDF/XML/N-Triples into RDF triples"
 arch=('x86_64')
 url="http://librdf.org/raptor"
-depends=('libxml2' 'curl' 'zlib>=1.2.5' 'libxslt' 'icu')
+depends=('libxml2' 'curl' 'zlib' 'libxslt' 'icu')
 license=('LGPL')
 options=('!libtool')
 source=("http://librdf.org/dist/source/raptor2-$pkgver.tar.gz")
@@ -24,5 +24,5 @@ build() {
 package() {
   cd raptor2-${pkgver}
   
-  make prefix="${pkgdir}"/usr install
+  make prefix=${pkgdir}/usr install
 }

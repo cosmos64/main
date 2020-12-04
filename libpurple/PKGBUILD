@@ -1,37 +1,37 @@
 
 _pkgbase=pidgin
 pkgname=libpurple
-pkgver=2.11.0
+pkgver=2.14.1
 pkgrel=1
 pkgdesc="IM library extracted from Pidgin"
 arch=('x86_64')
-url="http://pidgin.im/"
+url="https://pidgin.im/"
 license=('GPL')
-depends=('libsasl' 'dbus-glib' 'nss' 'cyrus-sasl-plugins' 'libidn' 'farstream')
-makedepends=('startup-notification' 'libxss' 'python2' 'avahi' 'tk'
+depends=('libsasl' 'dbus-glib' 'nss' 'libidn' 'farstream')
+makedepends=('startup-notification' 'libxss' 'python3' 'avahi'
              'ca-certificates' 'intltool')
-optdepends=('dbus-python2: for purple-remote and purple-url-handler')
 options=('!libtool')
-source=("http://downloads.sourceforge.net/${_pkgbase}/${_pkgbase}-${pkgver}.tar.bz2")
-md5sums=('7b167474db669aab2f71fa46835fb83f')
+source=("https://downloads.sourceforge.net/pidgin/${_pkgbase}-${pkgver}.tar.bz2")
+sha256sums=('f132e18d551117d9e46acce29ba4f40892a86746c366999166a3862b51060780')
 
 build() {
     cd ${_pkgbase}-${pkgver}
 
     ./configure --prefix=/usr \
-                --sysconfdir=/etc \
-                --disable-schemas-install \
-                --disable-meanwhile \
-                --disable-gnutls \
-                --disable-gtkui \
-                --disable-screensaver \
-                --disable-sm \
-                --disable-nm \
-                --disable-gtkspell \
-                --enable-cyrus-sasl \
-                --disable-doxygen \
-                --with-python=/usr/bin/python2 \
-                --with-system-ssl-certs=/etc/ssl/certs
+        --sysconfdir=/etc \
+        --disable-schemas-install \
+        --disable-meanwhile \
+        --disable-gnutls \
+        --disable-gtkui \
+        --disable-screensaver \
+        --disable-sm \
+        --disable-nm \
+        --disable-gtkspell \
+        --enable-cyrus-sasl \
+        --disable-doxygen \
+        --disable-tcl \
+        --with-python=/usr/bin/python3 \
+        --with-system-ssl-certs=/etc/ssl/certs
     make
 }
 

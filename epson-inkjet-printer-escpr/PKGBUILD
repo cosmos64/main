@@ -1,26 +1,26 @@
 
 pkgname=epson-inkjet-printer-escpr
-pkgver=1.6.9
+pkgver=1.7.8
 pkgrel=1
-pkgdesc="Common Linux printer driver for Epson Multifonction Inkjet Printers."
+pkgdesc="Common Linux printer driver for Epson Multifunction Inkjet Printers."
 arch=('x86_64')
 url="https://www.epson.com"
 license=('GPL')
 depends=('cups' 'gutenprint')
 # http://download.ebz.epson.net/dsc/search/01/search/
-source=("https://download3.ebz.epson.net/dsc/f/03/00/05/12/61/b548695f9c41e714ea5efcd8cf9200de4cdadaff/${pkgname}-${pkgver}-1lsb3.2.tar.gz")
-md5sums=('b3d9e21a12b2bc837d19a039fe54d1bc')
+source=("https://download3.ebz.epson.net/dsc/f/03/00/12/04/32/1a455ef8618def65700ca4e446311c2fb43cd839/${pkgname}-${pkgver}-1lsb3.2.tar.gz")
+md5sums=('1631fef39f62e368d95b3823121bf8a8')
 
 build() {
-  cd $srcdir
+  cd ${srcdir}
   tar xzvf ${pkgname}-${pkgver}-1lsb3.2.tar.gz
   
   cd ${pkgname}-${pkgver}
   
   ./configure --prefix=/usr \
-              --sysconfdir=/etc \
-              --localstatedir=/var \
-              --libexecdir=/usr/lib
+    --sysconfdir=/etc \
+    --localstatedir=/var \
+    --libexecdir=/usr/lib
   make
 }
 

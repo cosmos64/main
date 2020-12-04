@@ -1,30 +1,30 @@
 
 # Find the kernel name inside the chroot
-_extramodules=extramodules-4.8
+_extramodules=extramodules-5.8
 _kver="$(cat /lib/modules/${_extramodules}/version)"
 
 pkgname=broadcom-wl
 pkgver=6.30.223.271
 _pkgver=6_30_223_271
-pkgrel=12
+pkgrel=78
 pkgdesc='Broadcom 802.11abgn hybrid Linux networking device driver'
 arch=('x86_64')
-url='http://www.broadcom.com/support/802.11/'
+url='https://www.broadcom.com/support/802.11/'
 license=('custom')
-depends=('linux>=4.8' 'linux<4.9')
-makedepends=('linux-headers')
-
-source=("http://www.broadcom.com/docs/linux_sta/hybrid-v35_64-nodebug-pcoem-${_pkgver}.tar.gz"
+depends=('linux>=5.8.16' 'linux<5.9')
+makedepends=('linux-headers' 'elfutils')
+options=('!strip')
+install=install
+source=("https://docs.broadcom.com/docs-and-downloads/docs/linux_sta/hybrid-v35_64-nodebug-pcoem-${_pkgver}.tar.gz"
         'modprobe.d'
         'license.patch'
         'linux-recent.patch')
 md5sums=('115903050c41d466161784d4c843f4f9'
          '3600df7db49c759c655bc6a7789b28d4'
          '52f9dcef8112f8e325d9236e5290cb88'
-         '2eb66a57554537978529c3b61a53b31f')
+         'f085090506124e976beee0b36e7556d1')
 
 backup=('etc/modprobe.d/broadcom-wl.conf')
-install=install
 
 build() {
 	cd "${srcdir}"
@@ -33,6 +33,9 @@ build() {
 	patch -p1 -i linux-recent.patch
 	
 	sed -i 's|BRCM_WLAN_IFNAME eth|BRCM_WLAN_IFNAME wlan|' src/wl/sys/wl_linux.c
+	sed -i 's|get_ds()|KERNEL_DS|g' src/wl/sys/wl_iw.c
+    sed -i 's|get_ds()|KERNEL_DS|g' src/wl/sys/wl_cfg80211_hybrid.c
+    sed -i '/GE_49 :=/s|:= .*|:= 1|' Makefile
 
 	make -C /lib/modules/"${_kver}"/build M=`pwd`
 }
@@ -41,6 +44,14 @@ package() {
 	cd "${srcdir}"
 
 	install -D -m 755 wl.ko "${pkgdir}/lib/modules/${_extramodules}/wl.ko"
+	
+	# sign the module
+    _file=/usr/src/linux-${_kver}/scripts/sign-file
+    _pem=/$HOME/signing_key.pem
+    _key=/$HOME/signing_key.x509
+
+    ${_file} sha256 ${_pem} ${_key} ${pkgdir}/lib/modules/${_extramodules}/wl.ko
+    
 	gzip "${pkgdir}/lib/modules/${_extramodules}/wl.ko"
 
 	install -D -m 644 lib/LICENSE.txt "${pkgdir}/usr/share/licenses/${pkgname}/LICENSE"

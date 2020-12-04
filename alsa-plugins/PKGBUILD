@@ -1,20 +1,19 @@
 
 pkgname=alsa-plugins
-pkgver=1.1.1
-pkgrel=4
+pkgver=1.2.2
+pkgrel=2
 pkgdesc="Extra alsa plugins"
 arch=('x86_64')
-url="http://www.alsa-project.org"
+url="https://www.alsa-project.org"
 license=('GPL')
-depends=('alsa-lib')
-makedepends=('pulseaudio' 'jack' 'ffmpeg')
+depends=('alsa-lib' 'ffmpeg')
+makedepends=('pulseaudio' 'jack' )
 optdepends=('jack: Jack plugin'
-            'ffmpeg: libavcodec resampling plugin'
             'libsamplerate: libsamplerate resampling plugin'
             'speex: libspeexdsp resampling plugin')
 options=('!libtool')
 source=("ftp://ftp.alsa-project.org/pub/plugins/${pkgname}-${pkgver}.tar.bz2")
-md5sums=('69f9f3e2de3c97fc71d496e91e271fe5')
+md5sums=('8455e3c6fbc47f62f070afabc14ba575')
 
 build() {
   cd ${pkgname}-${pkgver}

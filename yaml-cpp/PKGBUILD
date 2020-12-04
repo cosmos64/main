@@ -1,30 +1,36 @@
 
 pkgname=yaml-cpp
-pkgver=0.5.2
-pkgrel=7
+pkgver=0.6.3
+pkgrel=2
 pkgdesc="YAML parser and emitter in C++ matching the YAML 1.2 spec"
 url="https://github.com/jbeder/yaml-cpp"
 arch=('x86_64')
 license=('MIT')
-depends=('boost')
+depends=('gcc')
 makedepends=('cmake')
-source=("https://github.com/jbeder/yaml-cpp/archive/release-$pkgver.tar.gz")
-md5sums=('2728af8a15e2b2c407730c45b99b274b')
+source=("https://github.com/jbeder/yaml-cpp/archive/yaml-cpp-${pkgver}.tar.gz")
+md5sums=('b45bf1089a382e81f6b661062c10d0c2')
 
 build() {
-    cd $srcdir/$pkgname-release-$pkgver
+    mkdir -p build
+    cd build
 
-    cmake . -DCMAKE_INSTALL_PREFIX=/usr -DBUILD_SHARED_LIBS=ON
+    cmake ../${pkgname}-${pkgname}-${pkgver} \
+        -DCMAKE_BUILD_TYPE=Release \
+        -DCMAKE_INSTALL_PREFIX=/usr \
+        -DYAML_BUILD_SHARED_LIBS=ON \
+        -DYAML_CPP_BUILD_TOOLS=OFF \
+        -DYAML_CPP_BUILD_TESTS=OFF
     make
 }
 
 package() {
-    cd $srcdir/$pkgname-release-$pkgver
-    make DESTDIR=$pkgdir install
+    cd build
+    make DESTDIR=${pkgdir} install
 
-    install -Dm644 license.txt $pkgdir/usr/share/licenses/$pkgname/LICENSE
+    install -Dm644 ../${pkgname}-${pkgname}-${pkgver}/LICENSE ${pkgdir}/usr/share/licenses/${pkgname}/LICENSE
     
-    install -Dm644 yaml-cpp-config.cmake $pkgdir/usr/lib/cmake/${pkgname}/yaml-cpp-config.cmake
-    install -Dm644 yaml-cpp-config-version.cmake $pkgdir/usr/lib/cmake/${pkgname}/yaml-cpp-config-version.cmake
-    install -Dm644 yaml-cpp-targets.cmake $pkgdir/usr/lib/cmake/${pkgname}/yaml-cpp-targets.cmake
+    #install -Dm644 yaml-cpp-config.cmake ${pkgdir}/usr/lib/cmake/${pkgname}/yaml-cpp-config.cmake
+    #install -Dm644 yaml-cpp-config-version.cmake ${pkgdir}/usr/lib/cmake/${pkgname}/yaml-cpp-config-version.cmake
+    #install -Dm644 yaml-cpp-targets.cmake ${pkgdir}/usr/lib/cmake/${pkgname}/yaml-cpp-targets.cmake
 }

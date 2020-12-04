@@ -1,27 +1,31 @@
 
 pkgname=desktop-file-utils
-pkgver=0.23
+pkgver=0.26
 pkgrel=1
 pkgdesc="Command line utilities for working with desktop entries"
 arch=('x86_64')
-url="http://www.freedesktop.org/wiki/Software/desktop-file-utils"
+url="https://www.freedesktop.org/wiki/Software/desktop-file-utils"
 license=('GPL')
 depends=('glib2')
-source=("http://www.freedesktop.org/software/desktop-file-utils/releases/desktop-file-utils-${pkgver}.tar.xz"
+makedepends=('meson' 'ninja')
+source=("https://www.freedesktop.org/software/desktop-file-utils/releases/desktop-file-utils-${pkgver}.tar.xz"
         'update-desktop-database.hook')
-md5sums=('599133d51cc9a41bfec186414906b6f1'
-         '63b2a090a303cbf9e244dc79b40fd81b')
+sha256sums=('b26dbde79ea72c8c84fb7f9d870ffd857381d049a86d25e0038c4cef4c747309'
+            '501f1eb35d9fbbd61666f40302b0ce63425299edf023c075986a24dc3ef18575')
 
 build() {
-  cd desktop-file-utils-${pkgver}
+  mkdir -p build
+  cd build
   
-  ./configure --prefix=/usr
-  make
+  meson ../${pkgname}-${pkgver} \
+    --prefix=/usr \
+    --buildtype=release 
+  ninja
 }
 
 package() {
-  cd desktop-file-utils-${pkgver}
-  make DESTDIR=${pkgdir} install
+  cd build
   
+  DESTDIR=${pkgdir} ninja install
   install -Dm644 ../update-desktop-database.hook ${pkgdir}/usr/share/libalpm/hooks/update-desktop-database.hook
 }

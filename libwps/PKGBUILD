@@ -1,16 +1,16 @@
 
 pkgname=libwps
-pkgver=0.4.4
+pkgver=0.4.12
 pkgrel=1
 pkgdesc="a Microsoft Works file word processor format import filter library"
 arch=('x86_64')
-url="http://libwps.sourceforge.net/"
+url="https://sourceforge.net/p/libwps/wiki/Home/"
 license=('LGPL')
 depends=('libwpd' 'librevenge')
 makedepends=('boost')
 options=('!libtool')
-source=("http://downloads.sourceforge.net/project/libwps/$pkgname/${pkgname}-${pkgver}/${pkgname}-${pkgver}.tar.xz")
-md5sums=('81a5f6024c3f044930f5e768c945e959')
+source=("https://downloads.sourceforge.net/project/libwps/libwps/${pkgname}-${pkgver}/${pkgname}-${pkgver}.tar.xz")
+md5sums=('802439e84e6ce185f736c1f3dc0321a2')
 
 build() {
     cd ${pkgname}-${pkgver}

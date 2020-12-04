@@ -1,18 +1,23 @@
 
 pkgname=gptfdisk
-pkgver=1.0.1
-pkgrel=4
+pkgver=1.0.5
+pkgrel=2
 pkgdesc="Text-mode partitioning tool that works on Globally Unique Identifier (GUID) Partition Table (GPT) disks"
 arch=('x86_64')
 url="http://www.rodsbooks.com/gdisk/"
 license=('GPL2')
 depends=('gcc-libs' 'util-linux' 'popt' 'icu')
-provides=("gdisk=$pkgver")
-source=("http://downloads.sourceforge.net/project/gptfdisk/${pkgname}/${pkgver}/${pkgname}-${pkgver}.tar.gz")
-md5sums=('d7f3d306b083123bcc6f5941efade586')
+provides=("gdisk=${pkgver}")
+source=("https://downloads.sourceforge.net/project/gptfdisk/${pkgname}/${pkgver}/${pkgname}-${pkgver}.tar.gz"
+        'ncurses.diff')
+md5sums=('58dac67c85e46ca87b587231549aefe6'
+         '7e49e885b94c6f67fc9bfaeec7e38348')
 
 build() {
   cd ${pkgname}-${pkgver}
+  # revert breaking macOS commit 
+  # https://sourceforge.net/p/gptfdisk/code/ci/bbd6b4cc67ffcdf7b2a6bd5008d28006cb147393/
+  patch -p1 -Ri ${srcdir}/ncurses.diff
 
   make
 }

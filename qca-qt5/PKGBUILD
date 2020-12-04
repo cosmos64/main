@@ -1,17 +1,18 @@
 
 pkgname=qca-qt5
 _pkgname=qca
-pkgver=2.1.1
-pkgrel=2
+pkgver=2.3.1
+pkgrel=1
+_commit=da4d1d06d4f67104738cb027b215eb41293c85cd
 pkgdesc="Qt Cryptographic Architecture"
 arch=('x86_64')
-url="http://delta.affinix.com/qca/"
+url="https://userbase.kde.org/QCA"
 license=('LGPL')
 depends=('qt5-base' 'ca-certificates' 'nss')
-makedepends=('cmake')
-#source=("http://delta.affinix.com/download/qca/2.0/${_pkgname}-${pkgver}.tar.gz")
-source=("http://download.kde.org/stable/qca/${pkgver}/src/${_pkgname}-${pkgver}.tar.xz")
-md5sums=('657cc701316600199199a6b6cb2c73c9')
+makedepends=('cmake' 'doxygen')
+source=("https://download.kde.org/stable/qca/${pkgver}/${_pkgname}-${pkgver}.tar.xz")
+#source=("https://github.com/KDE/qca/archive/${_commit}.zip")
+sha256sums=('c13851109abefc4623370989fae3a745bf6b1acb3c2a13a8958539823e974e4b')
 
 prepare() {
   cd ${_pkgname}-${pkgver}
@@ -26,7 +27,9 @@ build() {
     -DCMAKE_INSTALL_PREFIX=/usr \
     -DCMAKE_BUILD_TYPE=Release \
     -DQCA_SUFFIX=qt5 \
-    -DQCA_INSTALL_IN_QT_PREFIX=ON
+    -DQCA_FEATURE_INSTALL_DIR=${CMAKE_INSTALL_PREFIX}/usr/lib/qt5/mkspecs/features/ \
+    -DQCA_PLUGINS_INSTALL_DIR=${CMAKE_INSTALL_PREFIX}/usr/lib/qt5/plugins/
+    #-DQCA_INSTALL_IN_QT_PREFIX=ON
   make 
 }
 

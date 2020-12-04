@@ -1,16 +1,22 @@
 
 pkgname=python3-pillow
 _pkgname=Pillow
-pkgver=3.4.2
+pkgver=8.0.1
 pkgrel=1
 arch=('x86_64')
 pkgdesc="Python Imaging Library (PIL) fork. Python3 version."
-url="http://python-pillow.github.io/"
+url="https://python-pillow.org/"
 license=('BSD')
-depends=('python3' 'lcms' 'libwebp')
-makedepends=('python3-setuptools' 'libwebp' 'tk' 'sane')
-source=("https://github.com/python-pillow/Pillow/archive/${pkgver}.tar.gz")
-md5sums=('f55fb11d89df134ac01246a2b68d093f')
+depends=('python3' 'lcms2' 'libwebp')
+makedepends=('python3-setuptools' 'libwebp' 'tk')
+source=("https://files.pythonhosted.org/packages/source/P/Pillow/${_pkgname}-${pkgver}.tar.gz")
+sha256sums=('11c5c6e9b02c9dac08af04f093eb5a2f84857df70a7d4a6a6ad461aca803fb9e')
+
+build() { 
+  cd ${_pkgname}-${pkgver}
+
+  python3 setup.py build
+}
 
 package() {
   cd ${_pkgname}-${pkgver}

@@ -2,19 +2,20 @@
 pkgbase=nvidia-340xx-utils
 pkgname=('nvidia-340xx-utils' 'nvidia-340xx-settings')
 # Edit hardware-detection/hooks/hwdetect_7_graphics on version jump from 3xx.xx
-pkgver=340.98
-pkgrel=1
+pkgver=340.108
+pkgrel=2
 arch=('x86_64')
 url="http://www.nvidia.com/"
 license=('custom')
+makedepends=('xorg-server' 'libxvmc')
 options=('!strip')
 _pkg="NVIDIA-Linux-x86_64-${pkgver}-no-compat32"
-md5sums=('e8d1292d8d002a15e10ea349151fa8f2')
-
 source=("http://us.download.nvidia.com/XFree86/Linux-x86_64/${pkgver}/${_pkg}.run"
-        'nvidia-restore-settings.desktop')
-md5sums=("${md5sums[@]}"
-         '9237516792da7b6df32f8c7e8a98f475')
+        'nvidia-restore-settings.desktop'
+        'nvidia-drm-outputclass.conf')
+md5sums=('e783e383bd4344d590ad429eb0883717'
+         '9237516792da7b6df32f8c7e8a98f475'
+         'cb27b0f4a78af78aa96c5aacae23256c')
 
 create_links() {
   # create soname links
@@ -36,19 +37,17 @@ package_nvidia-340xx-utils() {
   optdepends=('gtk2: nvidia-settings' 'pkg-config: nvidia-xconfig'
               'opencl-nvidia: OpenCL support'
 	      'nvidia-settings: Gtk GUI')
-  conflicts=('libgl' 'nvidia-utils' 'nvidia-304xx-utils')
-  replaces=('nvidia-304xx-utils')
-  provides=('libgl')
+  conflicts=('nvidia-utils' 'nvidia-390xx-utils')
 
   cd "${srcdir}/${_pkg}"
 
   # X driver
   install -D -m755 nvidia_drv.so "${pkgdir}/usr/lib/xorg/modules/drivers/nvidia_drv.so"
   # GLX extension module for X
-  install -D -m755 "libglx.so.${pkgver}" "${pkgdir}/usr/lib/xorg/modules/extensions/libglx.so.${pkgver}"
-  ln -s "libglx.so.${pkgver}" "${pkgdir}/usr/lib/xorg/modules/extensions/libglx.so" # X doesn't find glx otherwise
+  #install -D -m755 "libglx.so.${pkgver}" "${pkgdir}/usr/lib/xorg/modules/extensions/libglx.so.${pkgver}"
+  #ln -s "libglx.so.${pkgver}" "${pkgdir}/usr/lib/xorg/modules/extensions/libglx.so" # X doesn't find glx otherwise
   # OpenGL library
-  install -D -m755 "libGL.so.${pkgver}" "${pkgdir}/usr/lib/libGL.so.${pkgver}"
+  #install -D -m755 "libGL.so.${pkgver}" "${pkgdir}/usr/lib/libGL.so.${pkgver}"
   # OpenGL core library
   install -D -m755 "libnvidia-glcore.so.${pkgver}" "${pkgdir}/usr/lib/libnvidia-glcore.so.${pkgver}"
   # VDPAU
@@ -76,6 +75,9 @@ package_nvidia-340xx-utils() {
   install -D -m644 NVIDIA_Changelog "${pkgdir}/usr/share/doc/nvidia/NVIDIA_Changelog"
   ln -s nvidia "${pkgdir}/usr/share/doc/nvidia-utils"
 
+  # conf
+  install -D -m644 ${srcdir}/nvidia-drm-outputclass.conf ${pkgdir}/etc/X11/xorg.conf.d/nvidia-drm-outputclass.conf
+
   create_links
 }
 
@@ -96,6 +98,6 @@ package_nvidia-340xx-settings() {
 
   # Install the autostart .desktop file, so that parameters saved through nvidia-settings
   # are automatically reloaded at each login
-  install -D -m644 "${srcdir}/nvidia-restore-settings.desktop" "${pkgdir}/usr/share/autostart/nvidia-restore-settings.desktop"
+  install -D -m644 "${srcdir}/nvidia-restore-settings.desktop" "${pkgdir}/etc/xdg/autostart/nvidia-restore-settings.desktop"
 }
 

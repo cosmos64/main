@@ -1,36 +1,37 @@
 
 pkgname=openmpi
-pkgver=1.10.4
+pkgver=4.0.5
+_pkgver=4.0
 pkgrel=1
 pkgdesc="High performance message passing library (MPI)"
 arch=('x86_64')
-url="http://www.open-mpi.org"
+url="https://www.open-mpi.org"
 license=('custom')
-depends=('gcc' 'openssh' 'valgrind' 'libltdl' 'hwloc')
+depends=('gcc' 'openssh' 'valgrind' 'libtool' 'hwloc')
 makedepends=('inetutils')
 options=('!libtool')
-source=("http://www.open-mpi.org/software/ompi/v1.10/downloads/${pkgname}-${pkgver}.tar.bz2")
-md5sums=('9d2375835c5bc5c184ecdeb76c7c78ac')
+source=("https://www.open-mpi.org/software/ompi/v${_pkgver}/downloads/${pkgname}-${pkgver}.tar.bz2")
+sha256sums=('c58f3863b61d944231077f344fe6b4b8fbb83f3d1bc93ab74640bf3e5acac009')
 
 build() {
    cd ${pkgname}-${pkgver}
 
    ./configure --prefix=/usr \
-               --sysconfdir=/etc/${pkgname} \
-               --mandir=/usr/share/man \
-               --enable-mpi-fortran=all \
-               --libdir=/usr/lib/${pkgname} \
-               --with-threads=posix \
-               --enable-smp-locks \
-               --with-valgrind \
-               --enable-memchecker \
-               --enable-debug \
-               --enable-pretty-print-stacktrace \
-               --without-slurm \
-               --with-hwloc=/usr \
-               --with-libltdl=/usr \
-               FC=/usr/bin/gfortran \
-               LDFLAGS="$LDFLAGS -Wl,-z,noexecstack"
+        --sysconfdir=/etc/${pkgname} \
+        --mandir=/usr/share/man \
+        --enable-mpi-fortran=all \
+        --libdir=/usr/lib/${pkgname} \
+        --enable-mpi-cxx \
+        --enable-builtin-atomics \
+        --with-valgrind \
+        --enable-memchecker \
+        --enable-debug \
+        --enable-pretty-print-stacktrace \
+        --without-slurm \
+        --with-hwloc=/usr \
+        --with-libltdl=/usr \
+        FC=/usr/bin/gfortran \
+        LDFLAGS="$LDFLAGS -Wl,-z,noexecstack"
 
    make
 }
@@ -43,9 +44,6 @@ package() {
    for i in ompi-c.pc ompi-cxx.pc ompi-f77.pc ompi-f90.pc ompi.pc; do
       ln -sf /usr/lib/openmpi/pkgconfig/$i ${pkgdir}/usr/lib/pkgconfig/
    done
-
-   # texlive conflicts
-   mv ${pkgdir}/usr/bin/otfinfo{,mpi}
 
    install -d -m 755 ${pkgdir}/etc/ld.so.conf.d
    echo /usr/lib/${pkgname} > ${pkgdir}/etc/ld.so.conf.d/${pkgname}.conf

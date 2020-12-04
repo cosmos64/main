@@ -1,34 +1,40 @@
 
 pkgname=gegl
-pkgver=0.3.8
-_pkgver=0.3
+pkgver=0.4.26
+_pkgver=0.4
 pkgrel=5
 pkgdesc="Graph based image processing framework."
 arch=('x86_64')
-url="http://www.gegl.org/"
+url="https://www.gegl.org/"
 license=('GPL3' 'LGPL3')
-depends=('babl' 'ffmpeg' 'openexr' 'librsvg' 'jasper' 'json-glib' 'libwebp' 'libraw' 'gexiv2')
-makedepends=('ruby' 'lua' 'exiv2' 'intltool' 'gobject-introspection')
+depends=('babl' 'ffmpeg' 'openexr' 'librsvg' 'json-glib' 'libwebp' 'libraw' 'gexiv2' 'lensfun' 'poppler')
+makedepends=('ruby' 'lua' 'exiv2' 'intltool' 'gobject-introspection' 'meson' 'ninja' 'python3-gobject3')
 options=('!libtool')
-source=("http://download.gimp.org/pub/gegl/${_pkgver}/${pkgname}-${pkgver}.tar.bz2")
-md5sums=('d2df2fe2236e3d5fe5bfc67d1c10cab4')
+source=("https://download.gimp.org/pub/gegl/${_pkgver}/${pkgname}-${pkgver}.tar.xz"
+        "https://gitlab.gnome.org/GNOME/gegl/commit/c1c3541caab485384087bbbcf1c83ef2d5bd4d43.diff")
+sha256sums=('0f371e2ed2b92162fefd3dde743e648ca08a6a1b2b05004867fbddc7e211e424'
+            'd69bb05a4327c2c1bc2bd1b6a4c938eb035ece37f8ea3ce6840d415dea4234e5')
+
 
 build() {
-  cd ${pkgname}-${pkgver}
-
-  ./configure --prefix=/usr \
-              --with-sdl \
-              --with-openexr \
-              --with-librsvg \
-              --with-libavformat \
-              --with-jasper \
-              --disable-docs 
-  make
+  mkdir -p build
+  cd build
+  
+  meson ../${pkgname}-${pkgver} \
+    --prefix=/usr \
+    --buildtype=release \
+    -Ddocs=false \
+    -Dlibav=enabled \
+    -Dlibrsvg=enabled \
+    -Djasper=disabled \
+    -Dopenexr=enabled \
+    -Dsdl2=enabled
+  ninja
 }
 
 package() {
-  cd ${pkgname}-${pkgver}
+  cd build
   
-  make install DESTDIR=${pkgdir}
+  DESTDIR=${pkgdir} ninja install
 }
 

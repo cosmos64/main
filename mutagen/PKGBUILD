@@ -1,18 +1,17 @@
 
 pkgname=mutagen
-pkgver=1.35
+pkgver=1.45.1
 pkgrel=1
-pkgdesc="An audio metadata tag reader and writer implemented in pure python"
+pkgdesc="Python module for handling audio metadata, supporting ASF, FLAC, MP4, MP3, Ogg and many more audio files."
 arch=('x86_64')
 url="https://mutagen.readthedocs.org/en/latest/"
 license=('GPL2')
-depends=('python2-setuptools')
-# wget https://bitbucket.org/lazka/mutagen/downloads/mutagen-1.30.tar.gz
-source=("https://bitbucket.org/lazka/mutagen/downloads/${pkgname}-${pkgver}.tar.gz")
-md5sums=('5d7f51b8e1219334fb5561d8402b9d9f')
+depends=('python3-setuptools')
+source=("https://github.com/quodlibet/mutagen/releases/download/release-${pkgver}/${pkgname}-${pkgver}.tar.gz")
+sha256sums=('6397602efb3c2d7baebd2166ed85731ae1c1d475abca22090b7141ff5034b3e1')
 
 package() {
   cd ${pkgname}-${pkgver}
   
-  python2 setup.py install --root=${pkgdir}
+  python3 setup.py install --root=${pkgdir}
 }

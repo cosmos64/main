@@ -1,29 +1,33 @@
 
 pkgname=json-c
-pkgver=0.12.1
-_pkgver=0.12.1-20160607
+pkgver=0.15
+_pkgver=0.14-20200419
 pkgrel=1
 pkgdesc="JSON-C implements a reference counting object model that allows you to easily construct JSON objects in C, output them as JSON formatted strings and parse JSON formatted strings back into the C representation of JSON objects."
 arch=('x86_64')
 url="https://github.com/json-c/json-c/wiki"
 license=('MIT')
 options=('!libtool' '!makeflags')
-#source=("https://s3.amazonaws.com/json-c_releases/releases/$pkgname-$pkgver.tar.gz"
-source=("https://github.com/json-c/json-c/archive/json-c-${_pkgver}.tar.gz")
-md5sums=('0a2a49a1e89044fdac414f984f3f81a6')
+makedepends=('cmake')
+source=("https://s3.amazonaws.com/json-c_releases/releases/${pkgname}-${pkgver}.tar.gz")
+#source=("https://github.com/json-c/json-c/archive/json-c-${_pkgver}.tar.gz")
+sha256sums=('b8d80a1ddb718b3ba7492916237bbf86609e9709fb007e7f7d4322f02341a4c6')
 
 build() {
-  cd ${pkgname}-${pkgname}-${_pkgver}
+  mkdir -p build
+  cd build
 
-  ./autogen.sh
-  ./configure --prefix=/usr --disable-static
+  cmake ../${pkgname}-${pkgver} \
+    -DCMAKE_BUILD_TYPE=Release \
+    -DCMAKE_INSTALL_PREFIX=/usr \
+    -DBUILD_STATIC_LIBS=OFF
   make
 }
 
 package() {
-  cd ${pkgname}-${pkgname}-${_pkgver}
+  cd build
   make DESTDIR=${pkgdir} install
   
-  install -Dm644 COPYING ${pkgdir}/usr/share/licenses/${pkgname}/COPYING
+  install -Dm644 ../${pkgname}-${pkgver}/COPYING ${pkgdir}/usr/share/licenses/${pkgname}/COPYING
 }
 

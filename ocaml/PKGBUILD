@@ -1,30 +1,31 @@
 
 # rebuild facile on any update
 pkgname=ocaml	
-pkgver=4.03.0
-_pkgver=4.03
+pkgver=4.11.1
+_pkgver=4.11
 pkgrel=1
 pkgdesc="A functional language with OO extensions"
 arch=('x86_64')
 license=('LGPL2' 'custom: QPL-1.0')
-url="http://caml.inria.fr/"
+url="https://ocaml.org/"
 depends=('gdbm')
 makedepends=('tk' 'ncurses>=5.6-7' 'libx11')
 optdepends=('ncurses: advanced ncurses features' 'tk: advanced tk features')
 options=('!makeflags' '!emptydirs')
-source=("http://caml.inria.fr/distrib/ocaml-${_pkgver}/${pkgname}-${pkgver}.tar.xz")
-md5sums=('89f62881e03dfad0cf04991fbc03f955')
+source=("https://caml.inria.fr/distrib/ocaml-${_pkgver}/${pkgname}-${pkgver}.tar.xz")
+md5sums=('6cc5593468d6fe66dd49a76c6a975b66')
 
 build() {
   cd ${pkgname}-${pkgver}
   
-  ./configure -prefix /usr 
+  ./configure --prefix=/usr \
+    --mandir=/usr/share/man
   make world.opt 
 }
 
 package_ocaml() {
   cd ${pkgbase}-${pkgver}
-  make PREFIX=${pkgdir}/usr MANDIR=${pkgdir}/usr/share/man install 
+  make DESTDIR=${pkgdir} install 
 
   install -m755 -d ${pkgdir}/usr/share/licenses/${pkgname}
   install -m644 LICENSE ${pkgdir}/usr/share/licenses/${pkgname}/
